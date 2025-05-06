@@ -166,12 +166,12 @@ private fun ChatPreview() {
     val messageList = listOf<ChatMessage>(
         ChatMessage(
             role = ChatRole.USER,
-            content = "Buondi albero saggio,\nchi è il più bello tra baldo3k e briooosh?",
+            content = "Buondi albero saggio,\ncome va??",
             createdAt = Date()
         ),
         ChatMessage(
             role = ChatRole.ASSISTANT,
-            content = "Ma salve,\novviamente baldo3k, che domande...",
+            content = "Ma salve,\ntutto bene qua",
             createdAt = Date()
         ),
         ChatMessage(

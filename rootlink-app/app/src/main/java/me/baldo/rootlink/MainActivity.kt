@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapScreen
 import me.baldo.rootlink.ui.theme.RootlinkTheme
@@ -26,12 +27,12 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     val chatVM: ChatViewModel = koinViewModel()
                     val chatState by chatVM.state.collectAsStateWithLifecycle()
-                    // ChatScreen(
-                    //     chatState = chatState,
-                    //     chatActions = chatVM.actions,
-                    //     modifier = Modifier.padding(innerPadding)
-                    // )
-                    MapScreen(Modifier.padding(innerPadding))
+                    ChatScreen(
+                        chatState = chatState,
+                        chatActions = chatVM.actions,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                    // MapScreen(Modifier.padding(innerPadding))
                 }
             }
         }

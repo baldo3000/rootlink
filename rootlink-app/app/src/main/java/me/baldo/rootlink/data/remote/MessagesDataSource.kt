@@ -62,10 +62,19 @@ class MessagesDataSource(
             createdAt = Clock.System.now().toString()
         )
         messages.add(question)
-        val answer = httpClient.post(url) {
-            contentType(ContentType.Application.Json)
-            setBody(RequestMessage(messages))
-        }.body<ResponseMessage>().responseMessage
+        val answer = try {
+            httpClient.post(url) {
+                contentType(ContentType.Application.Json)
+                setBody(RequestMessage(messages))
+            }.body<ResponseMessage>().responseMessage
+        } catch (_: Exception) {
+            Message(
+                UUID.randomUUID().toString(),
+                role = "assistant",
+                content = "NETWORK ERROR!",
+                createdAt = Clock.System.now().toString()
+            )
+        }
         messages.add(answer)
         Log.i(TAG, "Response: $answer")
         return answer.toChatMessage()
