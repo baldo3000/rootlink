@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import me.baldo.rootlink.data.chat.ChatMessage
+import me.baldo.rootlink.data.model.ChatMessage
 
 data class ChatState(
     val messages: List<ChatMessage> = emptyList(),

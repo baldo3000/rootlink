@@ -1,4 +1,4 @@
-package me.baldo.rootlink.data.chat
+package me.baldo.rootlink.data.model
 
 import java.util.Date
 import java.util.UUID

@@ -1,15 +1,27 @@
 package me.baldo.rootlink.ui.screens.map
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import com.google.android.gms.maps.model.CameraPosition
+import androidx.compose.ui.res.stringResource
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -18,14 +30,82 @@ import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.baldo.rootlink.R
+import me.baldo.rootlink.data.model.Tree
+import me.baldo.rootlink.ui.composables.AppBarWithDrawer
+import me.baldo.rootlink.utils.parseCoordinate
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun MapScreen(
+    mapState: MapState,
+    mapActions: ChatActions,
+    modifier: Modifier = Modifier
+) {
+    val cameraPositionState = rememberCameraPositionState()
+
+    AppBarWithDrawer(
+        title = stringResource(R.string.screens_map)
+    ) { innerPadding ->
+        Scaffold(
+            bottomBar = {
+                MapBottomBar(
+                    tab = mapState.tab,
+                    onTabClick = { mapActions.onTabChange(it) }
+                )
+            },
+            modifier = modifier.fillMaxSize()
+        ) {
+            when (mapState.tab) {
+                MapTab.EXPLORE -> Map(
+                    trees = mapState.trees,
+                    cameraPositionState = cameraPositionState
+                )
+
+                MapTab.MAP -> Spacer(modifier.fillMaxSize())
+            }
+        }
+    }
+}
 
 @Composable
-fun MapScreen(modifier: Modifier) {
-    val ctx = LocalContext.current
-    val singapore = LatLng(1.35, 103.87)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(singapore, 10f)
+private fun MapBottomBar(
+    tab: MapTab,
+    onTabClick: (MapTab) -> Unit,
+) {
+    NavigationBar {
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = if (tab == MapTab.EXPLORE) Icons.Filled.MyLocation else Icons.Outlined.MyLocation,
+                    contentDescription = stringResource(R.string.map_explore)
+                )
+            },
+            label = { Text(stringResource(R.string.map_explore)) },
+            selected = tab == MapTab.EXPLORE,
+            onClick = { onTabClick(MapTab.EXPLORE) }
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = if (tab == MapTab.MAP) Icons.Filled.Map else Icons.Outlined.Map,
+                    contentDescription = stringResource(R.string.map_explore)
+                )
+            },
+            label = { Text(stringResource(R.string.map_map)) },
+            selected = tab == MapTab.MAP,
+            onClick = { onTabClick(MapTab.MAP) }
+        )
     }
+}
+
+@Composable
+private fun Map(
+    cameraPositionState: CameraPositionState,
+    trees: List<Tree>,
+    modifier: Modifier = Modifier
+) {
+    val ctx = LocalContext.current
+
     GoogleMap(
         modifier = modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
@@ -35,19 +115,26 @@ fun MapScreen(modifier: Modifier) {
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style)
         ),
         uiSettings = MapUiSettings(
-            tiltGesturesEnabled = false,
             zoomControlsEnabled = false
         )
     ) {
-        MarkerComposable(
-            state = rememberUpdatedMarkerState(singapore),
-            onClick = { false }
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.tree_sample),
-                contentDescription = "Tree sample",
-                tint = Color.Unspecified
-            )
+        for (tree in trees) {
+            val lat: Double? =
+                runCatching { parseCoordinate(tree.latitude) }.getOrElse { null }
+            val lon: Double? =
+                runCatching { parseCoordinate(tree.longitude) }.getOrElse { null }
+            if (lat != null && lon != null) {
+                MarkerComposable(
+                    state = rememberUpdatedMarkerState(LatLng(lat, lon)),
+                    onClick = { true }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.tree_sample),
+                        contentDescription = tree.species,
+                        tint = Color.Unspecified
+                    )
+                }
+            }
         }
     }
 }

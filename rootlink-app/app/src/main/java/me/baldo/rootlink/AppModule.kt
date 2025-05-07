@@ -6,11 +6,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import me.baldo.rootlink.data.remote.MessagesDataSource
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
+import me.baldo.rootlink.ui.screens.map.MapViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
     viewModel { ChatViewModel() }
+    viewModel { MapViewModel() }
     single {
         HttpClient {
             install(ContentNegotiation) {

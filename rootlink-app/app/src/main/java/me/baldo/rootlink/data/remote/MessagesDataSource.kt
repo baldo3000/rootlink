@@ -9,8 +9,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import me.baldo.rootlink.data.chat.ChatMessage
-import me.baldo.rootlink.data.chat.ChatRole
+import me.baldo.rootlink.data.model.ChatMessage
+import me.baldo.rootlink.data.model.ChatRole
 import java.time.Instant
 import java.util.Date
 import java.util.UUID

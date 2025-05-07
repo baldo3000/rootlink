@@ -31,8 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import me.baldo.rootlink.data.chat.ChatMessage
-import me.baldo.rootlink.data.chat.ChatRole
+import me.baldo.rootlink.data.model.ChatMessage
+import me.baldo.rootlink.data.model.ChatRole
 import me.baldo.rootlink.data.remote.MessagesDataSource
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
