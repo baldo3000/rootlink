@@ -27,13 +27,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import me.baldo.rootlink.R
 import me.baldo.rootlink.data.model.ChatMessage
 import me.baldo.rootlink.data.model.ChatRole
 import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.ui.composables.AppBarWithDrawer
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,6 +48,7 @@ import java.util.Locale
 fun ChatScreen(
     chatState: ChatState,
     chatActions: ChatActions,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -55,57 +61,63 @@ fun ChatScreen(
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        bottomBar = {
-            OutlinedTextField(
-                value = chatState.fieldText,
-                placeholder = { Text("Make a question...") },
-                onValueChange = { chatActions.updateFieldText(it) },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                trailingIcon = {
-                    IconButton(onClick = {
-                        val message = chatState.fieldText
-                        if (message.isNotEmpty()) {
-                            chatActions.addMessage(
-                                ChatMessage(
-                                    role = ChatRole.USER,
-                                    content = chatState.fieldText,
-                                    createdAt = Date()
-                                )
-                            )
-                            scope.launch {
-                                val response = messagesDataSource.sendMessage(chatState.fieldText)
-                                chatActions.addMessage(response)
-                            }
-                            chatActions.updateFieldText("")
-                        }
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, "Send")
-                    }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
-                )
-            )
-        }
+    AppBarWithDrawer(
+        title = stringResource(R.string.screens_chat)
     ) { innerPadding ->
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding()),
-        ) {
-            items(chatState.messages) { message ->
-                ChatBubble(
-                    message = message,
-                    modifier = Modifier.fillMaxWidth()
+        Scaffold(
+            modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
+            bottomBar = {
+                OutlinedTextField(
+                    value = chatState.fieldText,
+                    placeholder = { Text("Make a question...") },
+                    onValueChange = { chatActions.updateFieldText(it) },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .padding(bottom = 16.dp),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            val message = chatState.fieldText
+                            if (message.isNotEmpty()) {
+                                chatActions.addMessage(
+                                    ChatMessage(
+                                        role = ChatRole.USER,
+                                        content = chatState.fieldText,
+                                        createdAt = Date()
+                                    )
+                                )
+                                scope.launch {
+                                    val response =
+                                        messagesDataSource.sendMessage(chatState.fieldText)
+                                    chatActions.addMessage(response)
+                                }
+                                chatActions.updateFieldText("")
+                            }
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.Send, "Send")
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
+                    )
                 )
+            }
+        ) { innerPadding ->
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                items(chatState.messages) { message ->
+                    ChatBubble(
+                        message = message,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }
@@ -160,7 +172,7 @@ private fun ChatBubble(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun ChatPreview() {
     val messageList = listOf<ChatMessage>(
@@ -188,5 +200,6 @@ private fun ChatPreview() {
     ChatScreen(
         chatActions = object : ChatActions {},
         chatState = ChatState(messageList),
+        navController = rememberNavController()
     )
 }

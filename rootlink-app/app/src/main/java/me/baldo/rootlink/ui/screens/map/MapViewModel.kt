@@ -16,6 +16,7 @@ data class MapState(
 interface ChatActions {
     fun onTabChange(tab: MapTab)
     fun addTree(tree: Tree)
+    fun addTrees(trees: List<Tree>)
     fun updateTrees(trees: List<Tree>)
 }
 
@@ -30,6 +31,10 @@ class MapViewModel : ViewModel() {
 
         override fun addTree(tree: Tree) {
             _state.update { it.copy(trees = it.trees + tree) }
+        }
+
+        override fun addTrees(trees: List<Tree>) {
+            _state.update { it.copy(trees = it.trees + trees) }
         }
 
         override fun updateTrees(trees: List<Tree>) {

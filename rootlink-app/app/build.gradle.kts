@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.android.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.android.maps.compose.widgets)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

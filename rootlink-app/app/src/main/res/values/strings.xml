@@ -8,4 +8,8 @@
 
     <!-- Screens -->
     <string name="screens_map">Map</string>
+    <string name="screens_chat">Chat</string>
+
+    <!-- Menu -->
+    <string name="menu_drawer">Menu drawer</string>
 </resources>

@@ -1,8 +1,11 @@
 package me.baldo.rootlink.ui.screens.map
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
@@ -19,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
@@ -27,18 +32,21 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerComposable
+import com.google.maps.android.compose.MarkerInfoWindow
+import com.google.maps.android.compose.MarkerInfoWindowComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.model.Tree
+import me.baldo.rootlink.ui.RootlinkRoute
 import me.baldo.rootlink.ui.composables.AppBarWithDrawer
 import me.baldo.rootlink.utils.parseCoordinate
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MapScreen(
     mapState: MapState,
     mapActions: ChatActions,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val cameraPositionState = rememberCameraPositionState()
@@ -47,18 +55,20 @@ fun MapScreen(
         title = stringResource(R.string.screens_map)
     ) { innerPadding ->
         Scaffold(
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
             bottomBar = {
                 MapBottomBar(
                     tab = mapState.tab,
                     onTabClick = { mapActions.onTabChange(it) }
                 )
-            },
-            modifier = modifier.fillMaxSize()
-        ) {
+            }
+        ) { innerPadding ->
             when (mapState.tab) {
-                MapTab.EXPLORE -> Map(
+                MapTab.EXPLORE -> Explore(
                     trees = mapState.trees,
-                    cameraPositionState = cameraPositionState
+                    cameraPositionState = cameraPositionState,
+                    onTreeClick = { navController.navigate(RootlinkRoute.Chat) },
+                    modifier = modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
 
                 MapTab.MAP -> Spacer(modifier.fillMaxSize())
@@ -99,9 +109,10 @@ private fun MapBottomBar(
 }
 
 @Composable
-private fun Map(
+private fun Explore(
     cameraPositionState: CameraPositionState,
     trees: List<Tree>,
+    onTreeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
@@ -115,18 +126,26 @@ private fun Map(
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style)
         ),
         uiSettings = MapUiSettings(
+            mapToolbarEnabled = false,
             zoomControlsEnabled = false
         )
     ) {
+        val startTime = System.currentTimeMillis()
         for (tree in trees) {
             val lat: Double? =
                 runCatching { parseCoordinate(tree.latitude) }.getOrElse { null }
             val lon: Double? =
                 runCatching { parseCoordinate(tree.longitude) }.getOrElse { null }
             if (lat != null && lon != null) {
-                MarkerComposable(
+                MarkerInfoWindowComposable(
                     state = rememberUpdatedMarkerState(LatLng(lat, lon)),
-                    onClick = { true }
+                    onClick = {
+                        onTreeClick()
+                        false
+                    },
+                    infoContent = {
+                        Text(tree.species)
+                    }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.tree_sample),
@@ -136,5 +155,7 @@ private fun Map(
                 }
             }
         }
+        val endTime = System.currentTimeMillis()
+        Log.i("TIME", "Markers drawn in ${endTime - startTime} ms")
     }
 }
