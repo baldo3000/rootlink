@@ -9,6 +9,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.baldo.rootlink.BuildConfig
 import me.baldo.rootlink.data.model.ChatMessage
 import me.baldo.rootlink.data.model.ChatRole
 import java.time.Instant
@@ -47,7 +48,7 @@ class MessagesDataSource(
 ) {
     companion object {
         private const val TAG = "MessagesDataSource"
-        private const val BASE_URL = "http://192.168.1.180:3000"
+        private const val BASE_URL = BuildConfig.SERVER_ADDRESS
     }
 
     private val messages = mutableListOf<Message>()
@@ -67,7 +68,8 @@ class MessagesDataSource(
                 contentType(ContentType.Application.Json)
                 setBody(RequestMessage(messages))
             }.body<ResponseMessage>().responseMessage
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending message: ${e.message}")
             Message(
                 UUID.randomUUID().toString(),
                 role = "assistant",

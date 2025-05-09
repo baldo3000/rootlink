@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.cio)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.android.maps.compose)
     implementation(libs.maps.compose.utils)
