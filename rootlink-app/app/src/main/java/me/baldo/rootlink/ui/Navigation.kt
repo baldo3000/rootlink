@@ -9,9 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import me.baldo.rootlink.R
-import me.baldo.rootlink.data.model.Tree
 import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapScreen
@@ -34,22 +31,6 @@ fun RootlinkNavGraph(navController: NavHostController) {
     val chatVM = koinViewModel<ChatViewModel>()
     val chatState by chatVM.state.collectAsStateWithLifecycle()
 
-    val rawResources = listOf(
-        R.raw.trees_emilia_romagna,
-        // R.raw.trees_sardegna
-    )
-    val json = Json { ignoreUnknownKeys = true }
-    val trees = mutableListOf<Tree>()
-
-    rawResources.forEach { resourceId ->
-        val text = ctx.resources.openRawResource(resourceId)
-            .bufferedReader()
-            .use { it.readText() }
-        trees += json.decodeFromString<List<Tree>>(text)
-    }
-    Log.i("TreeLoading", "Loaded trees")
-    mapVM.actions.updateTrees(trees)
-
     NavHost(
         navController = navController,
         startDestination = RootlinkRoute.Map
@@ -59,6 +40,7 @@ fun RootlinkNavGraph(navController: NavHostController) {
             MapScreen(
                 mapState = mapState,
                 mapActions = mapVM.actions,
+                openTreeChat = chatVM.actions::openTreeChat,
                 navController = navController
             )
         }

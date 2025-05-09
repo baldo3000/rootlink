@@ -10,8 +10,7 @@ import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.baldo.rootlink.BuildConfig
-import me.baldo.rootlink.data.model.ChatMessage
-import me.baldo.rootlink.data.model.ChatRole
+import me.baldo.rootlink.data.database.ChatMessage
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -29,9 +28,10 @@ private data class Message(
     @SerialName("createdAt")
     val createdAt: String
 ) {
-    fun toChatMessage(): ChatMessage = ChatMessage(
+    fun toChatMessage(treeId: String): ChatMessage = ChatMessage(
+        treeId = treeId,
         id = this.id,
-        role = if (this.role == "assistant") ChatRole.ASSISTANT else ChatRole.USER,
+        role = this.role,
         content = this.content,
         createdAt = runCatching { Date.from(Instant.parse(createdAt)) }.getOrElse { Date() }
     )
@@ -51,22 +51,13 @@ class MessagesDataSource(
         private const val BASE_URL = BuildConfig.SERVER_ADDRESS
     }
 
-    private val messages = mutableListOf<Message>()
-
     @OptIn(ExperimentalTime::class)
-    suspend fun sendMessage(message: String): ChatMessage {
+    suspend fun sendMessage(messages: List<ChatMessage>): ChatMessage {
         val url = "$BASE_URL/api/chat"
-        val question = Message(
-            id = UUID.randomUUID().toString(),
-            role = "user",
-            content = message,
-            createdAt = Clock.System.now().toString()
-        )
-        messages.add(question)
         val answer = try {
             httpClient.post(url) {
                 contentType(ContentType.Application.Json)
-                setBody(RequestMessage(messages))
+                setBody(RequestMessage(messages.toMessages()))
             }.body<ResponseMessage>().responseMessage
         } catch (e: Exception) {
             Log.e(TAG, "Error sending message: ${e.message}")
@@ -77,8 +68,19 @@ class MessagesDataSource(
                 createdAt = Clock.System.now().toString()
             )
         }
-        messages.add(answer)
         Log.i(TAG, "Response: $answer")
-        return answer.toChatMessage()
+        return answer.toChatMessage(messages.first().treeId)
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+private fun List<ChatMessage>.toMessages(): List<Message> {
+    return this.map { message ->
+        Message(
+            id = message.id,
+            role = message.role,
+            content = message.content,
+            createdAt = Clock.System.now().toString()
+        )
     }
 }

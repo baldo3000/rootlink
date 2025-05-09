@@ -1,8 +1,6 @@
 package me.baldo.rootlink.ui.screens.map
 
-import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -31,13 +28,11 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerComposable
-import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerInfoWindowComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.baldo.rootlink.R
-import me.baldo.rootlink.data.model.Tree
+import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.ui.RootlinkRoute
 import me.baldo.rootlink.ui.composables.AppBarWithDrawer
 import me.baldo.rootlink.utils.parseCoordinate
@@ -46,6 +41,7 @@ import me.baldo.rootlink.utils.parseCoordinate
 fun MapScreen(
     mapState: MapState,
     mapActions: ChatActions,
+    openTreeChat: (String) -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -67,7 +63,10 @@ fun MapScreen(
                 MapTab.EXPLORE -> Explore(
                     trees = mapState.trees,
                     cameraPositionState = cameraPositionState,
-                    onTreeClick = { navController.navigate(RootlinkRoute.Chat) },
+                    onTreeClick = {
+                        openTreeChat(it.cardId)
+                        navController.navigate(RootlinkRoute.Chat)
+                    },
                     modifier = modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
 
@@ -112,7 +111,7 @@ private fun MapBottomBar(
 private fun Explore(
     cameraPositionState: CameraPositionState,
     trees: List<Tree>,
-    onTreeClick: () -> Unit,
+    onTreeClick: (Tree) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
@@ -140,7 +139,7 @@ private fun Explore(
                 MarkerInfoWindowComposable(
                     state = rememberUpdatedMarkerState(LatLng(lat, lon)),
                     onClick = {
-                        onTreeClick()
+                        onTreeClick(tree)
                         false
                     },
                     infoContent = {

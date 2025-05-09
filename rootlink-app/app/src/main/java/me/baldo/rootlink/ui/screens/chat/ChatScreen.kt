@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,13 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
-import me.baldo.rootlink.data.model.ChatMessage
-import me.baldo.rootlink.data.model.ChatRole
-import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.ui.composables.AppBarWithDrawer
-import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,13 +46,10 @@ fun ChatScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
-    val messagesDataSource = koinInject<MessagesDataSource>()
-
     val listState = rememberLazyListState()
-    LaunchedEffect(chatState.messages.size) {
-        if (chatState.messages.isNotEmpty()) {
-            listState.animateScrollToItem(index = chatState.messages.lastIndex)
+    LaunchedEffect(chatState.chatMessages.size) {
+        if (chatState.chatMessages.isNotEmpty()) {
+            listState.animateScrollToItem(index = chatState.chatMessages.lastIndex)
         }
     }
 
@@ -79,21 +71,7 @@ fun ChatScreen(
                     trailingIcon = {
                         IconButton(onClick = {
                             val message = chatState.fieldText
-                            if (message.isNotEmpty()) {
-                                chatActions.addMessage(
-                                    ChatMessage(
-                                        role = ChatRole.USER,
-                                        content = chatState.fieldText,
-                                        createdAt = Date()
-                                    )
-                                )
-                                scope.launch {
-                                    val response =
-                                        messagesDataSource.sendMessage(chatState.fieldText)
-                                    chatActions.addMessage(response)
-                                }
-                                chatActions.updateFieldText("")
-                            }
+                            if (message.isNotEmpty()) chatActions.sendMessage()
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, "Send")
                         }
@@ -112,7 +90,7 @@ fun ChatScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                items(chatState.messages) { message ->
+                items(chatState.chatMessages) { message ->
                     ChatBubble(
                         message = message,
                         modifier = Modifier.fillMaxWidth()
@@ -138,32 +116,36 @@ private fun ChatBubble(
                 .widthIn(min = this.maxWidth * 0.25f, max = this.maxWidth * 0.75f)
                 .background(
                     color = when (message.role) {
-                        ChatRole.USER -> MaterialTheme.colorScheme.primaryContainer
-                        ChatRole.ASSISTANT -> MaterialTheme.colorScheme.tertiaryContainer
+                        "user" -> MaterialTheme.colorScheme.primaryContainer
+                        "assistant" -> MaterialTheme.colorScheme.tertiaryContainer
+                        else -> error("Unknown role")
                     },
                     shape = RoundedCornerShape(16.dp)
                 )
                 .padding(12.dp)
                 .align(
                     when (message.role) {
-                        ChatRole.USER -> Alignment.TopEnd
-                        ChatRole.ASSISTANT -> Alignment.TopStart
+                        "user" -> Alignment.TopEnd
+                        "assistant" -> Alignment.TopStart
+                        else -> error("Unknown role")
                     }
                 )
         ) {
             Text(
                 text = message.content,
                 color = when (message.role) {
-                    ChatRole.USER -> MaterialTheme.colorScheme.onPrimaryContainer
-                    ChatRole.ASSISTANT -> MaterialTheme.colorScheme.onTertiaryContainer
+                    "user" -> MaterialTheme.colorScheme.onPrimaryContainer
+                    "assistant" -> MaterialTheme.colorScheme.onTertiaryContainer
+                    else -> error("Unknown role")
                 },
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
                 text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(message.createdAt),
                 color = when (message.role) {
-                    ChatRole.USER -> MaterialTheme.colorScheme.onPrimaryContainer
-                    ChatRole.ASSISTANT -> MaterialTheme.colorScheme.onTertiaryContainer
+                    "user" -> MaterialTheme.colorScheme.onPrimaryContainer
+                    "assistant" -> MaterialTheme.colorScheme.onTertiaryContainer
+                    else -> error("Unknown role")
                 },
                 style = LocalTextStyle.current.copy(fontSize = 12.sp),
                 modifier = Modifier.align(Alignment.End),
@@ -177,29 +159,33 @@ private fun ChatBubble(
 private fun ChatPreview() {
     val messageList = listOf<ChatMessage>(
         ChatMessage(
-            role = ChatRole.USER,
+            treeId = "",
+            role = "user",
             content = "Buondi albero saggio,\ncome va??",
             createdAt = Date()
         ),
         ChatMessage(
-            role = ChatRole.ASSISTANT,
+            treeId = "",
+            role = "assistant",
             content = "Ma salve,\ntutto bene qua",
             createdAt = Date()
         ),
         ChatMessage(
-            role = ChatRole.USER,
+            treeId = "",
+            role = "user",
             content = "Ma ne sei sicuro?",
             createdAt = Date()
         ),
         ChatMessage(
-            role = ChatRole.ASSISTANT,
+            treeId = "",
+            role = "assistant",
             content = "Sicurissimo!",
             createdAt = Date()
         ),
     )
     ChatScreen(
         chatActions = object : ChatActions {},
-        chatState = ChatState(messageList),
+        chatState = ChatState(chatMessages = messageList),
         navController = rememberNavController()
     )
 }

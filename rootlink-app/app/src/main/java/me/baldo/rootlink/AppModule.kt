@@ -1,12 +1,15 @@
 package me.baldo.rootlink
 
 import android.annotation.SuppressLint
+import androidx.room.Room
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import me.baldo.rootlink.data.database.RootlinkLocalDatabase
 import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.data.repositories.MessagesRepository
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapViewModel
 import org.koin.core.module.dsl.viewModel
@@ -18,8 +21,23 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
 val appModule = module {
-    viewModel { ChatViewModel() }
-    viewModel { MapViewModel() }
+    single { MessagesDataSource(get()) }
+
+    viewModel { ChatViewModel(get(), get()) }
+    viewModel { MapViewModel(get()) }
+
+    single {
+        Room.databaseBuilder(
+            get(),
+            RootlinkLocalDatabase::class.java,
+            "rootlink"
+        )
+            // TODO: Use a proper migration strategy
+            .fallbackToDestructiveMigration(true)
+            .build()
+    }
+    single { MessagesRepository(get<RootlinkLocalDatabase>().treesDAO()) }
+
     single {
         HttpClient(OkHttp) {
             engine {
@@ -37,7 +55,6 @@ val appModule = module {
             }
         }
     }
-    single { MessagesDataSource(get()) }
 }
 
 private fun createInsecureSslSocketFactory(): SSLSocketFactory {

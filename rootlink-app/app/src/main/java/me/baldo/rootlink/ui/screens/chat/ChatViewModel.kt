@@ -1,28 +1,68 @@
 package me.baldo.rootlink.ui.screens.chat
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import me.baldo.rootlink.data.model.ChatMessage
+import kotlinx.coroutines.launch
+import me.baldo.rootlink.data.database.ChatMessage
+import me.baldo.rootlink.data.database.Tree
+import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.data.repositories.MessagesRepository
+import java.util.Date
 
 data class ChatState(
-    val messages: List<ChatMessage> = emptyList(),
+    val tree: Tree? = null,
+    val chatMessages: List<ChatMessage> = emptyList(),
     val fieldText: String = ""
 )
 
 interface ChatActions {
-    fun addMessage(message: ChatMessage) {}
+    fun openTreeChat(cardId: String) {}
+    fun sendMessage() {}
     fun updateFieldText(text: String) {}
 }
 
-class ChatViewModel : ViewModel() {
+class ChatViewModel(
+    private val messagesRepository: MessagesRepository,
+    private val messagesDataSource: MessagesDataSource
+) : ViewModel() {
     private val _state = MutableStateFlow<ChatState>(ChatState())
     val state = _state.asStateFlow()
-
     val actions = object : ChatActions {
-        override fun addMessage(message: ChatMessage) {
-            _state.update { it.copy(messages = it.messages + message) }
+        override fun openTreeChat(cardId: String) {
+            viewModelScope.launch {
+                val tree = messagesRepository.getTree(cardId)
+                val treeWithChatMessages = messagesRepository.getChatMessagesForTree(cardId)
+                _state.update {
+                    it.copy(
+                        tree = tree,
+                        chatMessages = treeWithChatMessages.chatMessages
+                    )
+                }
+            }
+        }
+
+        override fun sendMessage() {
+            val message = ChatMessage(
+                treeId = state.value.tree?.cardId ?: error("No tree selected"),
+                role = "user",
+                content = state.value.fieldText,
+                createdAt = Date()
+            )
+            // Update local copy
+            _state.update { it.copy(chatMessages = it.chatMessages + message, fieldText = "") }
+            // Update database
+            viewModelScope.launch {
+                messagesRepository.insertChatMessage(message)
+            }
+            // Send message to the server and wait for response
+            viewModelScope.launch {
+                val responseMessage = messagesDataSource.sendMessage(_state.value.chatMessages)
+                _state.update { it.copy(chatMessages = it.chatMessages + responseMessage) }
+                messagesRepository.insertChatMessage(responseMessage)
+            }
         }
 
         override fun updateFieldText(text: String) {
