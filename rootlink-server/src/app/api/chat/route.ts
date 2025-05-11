@@ -1,17 +1,7 @@
 import { google } from '@ai-sdk/google';
 import { generateText, streamText, appendResponseMessages, Message, InvalidPromptError } from 'ai';
 
-const model = google('gemini-2.0-flash', {
-    safetySettings: [
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-      ],
-});
-const systemPrompt = `
-You are a helpful assistant. 
-`;
+const model = google('gemini-2.0-flash');
 
 export async function POST(req: Request) {
     try {
@@ -20,7 +10,6 @@ export async function POST(req: Request) {
         console.log('Messages:', messages);
         const { response, text } = await generateText({
             model: model,
-            system: systemPrompt,
             messages: messages,
         });
         const newMessages = appendResponseMessages({ messages: messages, responseMessages: response.messages });
