@@ -19,21 +19,21 @@ sealed interface BottomBarTab {
     data object Home : BottomBarTab {
         override val icon = Icons.Outlined.Home
         override val iconSelected = Icons.Filled.Home
-        override val titleResID = R.string.screens_home
+        override val titleResID = R.string.screen_home
         override val screen = RootlinkRoute.Home
     }
 
     data object Map : BottomBarTab {
         override val icon = Icons.Outlined.Map
         override val iconSelected = Icons.Filled.Map
-        override val titleResID = R.string.screens_map
+        override val titleResID = R.string.screen_map
         override val screen = RootlinkRoute.Map
     }
 
     data object Favourites : BottomBarTab {
         override val icon = Icons.Outlined.FavoriteBorder
         override val iconSelected = Icons.Filled.Favorite
-        override val titleResID = R.string.screens_favourites
+        override val titleResID = R.string.screen_favourites
         override val screen = RootlinkRoute.Favourites
     }
 

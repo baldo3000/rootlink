@@ -60,7 +60,7 @@ class MessagesDataSource(
                 setBody(RequestMessage(messages.toMessages()))
             }.body<ResponseMessage>().responseMessage
         } catch (e: Exception) {
-            Log.e(TAG, "Error sending message: ${e.message}")
+            Log.e(TAG, "Error while sending message: ${e.message}")
             Message(
                 UUID.randomUUID().toString(),
                 role = "assistant",
@@ -68,7 +68,6 @@ class MessagesDataSource(
                 createdAt = Clock.System.now().toString()
             )
         }
-        Log.i(TAG, "Response: $answer")
         return answer.toChatMessage(messages.first().treeId)
     }
 }

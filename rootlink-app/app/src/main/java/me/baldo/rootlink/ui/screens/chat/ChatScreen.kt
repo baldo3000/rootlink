@@ -54,7 +54,7 @@ fun ChatScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = stringResource(R.string.screens_chat),
+                title = stringResource(R.string.screen_chat),
                 onBackPressed = navController::navigateUp
             )
         },
