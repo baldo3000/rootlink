@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -127,7 +128,8 @@ private fun Explore(
         uiSettings = MapUiSettings(
             mapToolbarEnabled = false,
             zoomControlsEnabled = false
-        )
+        ),
+        mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM
     ) {
         val startTime = System.currentTimeMillis()
         for (tree in trees) {

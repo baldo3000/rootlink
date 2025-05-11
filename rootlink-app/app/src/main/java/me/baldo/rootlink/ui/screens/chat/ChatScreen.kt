@@ -91,10 +91,12 @@ fun ChatScreen(
                     .padding(innerPadding),
             ) {
                 items(chatState.chatMessages) { message ->
-                    ChatBubble(
-                        message = message,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    if(message.role == "user" || message.role == "assistant") {
+                        ChatBubble(
+                            message = message,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

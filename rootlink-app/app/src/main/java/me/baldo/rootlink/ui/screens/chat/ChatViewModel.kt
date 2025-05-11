@@ -35,10 +35,24 @@ class ChatViewModel(
             viewModelScope.launch {
                 val tree = messagesRepository.getTree(cardId)
                 val treeWithChatMessages = messagesRepository.getChatMessagesForTree(cardId)
+                val messages = treeWithChatMessages.chatMessages.let {
+                    if (it.isEmpty()) {
+                        listOf(
+                            ChatMessage(
+                                treeId = cardId,
+                                role = "system",
+                                content = tree?.generateAIPrompt() ?: error("Trying to speak to a tree which does not exist"),
+                                createdAt = Date()
+                            )
+                        )
+                    } else {
+                        it
+                    }
+                }
                 _state.update {
                     it.copy(
                         tree = tree,
-                        chatMessages = treeWithChatMessages.chatMessages
+                        chatMessages = messages
                     )
                 }
             }
