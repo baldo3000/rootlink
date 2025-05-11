@@ -34,7 +34,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.ChatMessage
-import me.baldo.rootlink.ui.composables.AppBarWithDrawer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,51 +51,51 @@ fun ChatScreen(
             listState.animateScrollToItem(index = chatState.chatMessages.lastIndex)
         }
     }
-
-    AppBarWithDrawer(
-        title = stringResource(R.string.screens_chat)
-    ) { innerPadding ->
-        Scaffold(
-            modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
-            bottomBar = {
-                OutlinedTextField(
-                    value = chatState.fieldText,
-                    placeholder = { Text("Make a question...") },
-                    onValueChange = { chatActions.updateFieldText(it) },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .padding(bottom = 16.dp),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            val message = chatState.fieldText
-                            if (message.isNotEmpty()) chatActions.sendMessage()
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.Send, "Send")
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
-                    )
-                )
-            }
-        ) { innerPadding ->
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.Bottom,
+    Scaffold(
+        topBar = {
+            TopBar(
+                title = stringResource(R.string.screens_chat),
+                onBackPressed = navController::navigateUp
+            )
+        },
+        bottomBar = {
+            OutlinedTextField(
+                value = chatState.fieldText,
+                placeholder = { Text("Make a question...") },
+                onValueChange = { chatActions.updateFieldText(it) },
+                singleLine = true,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-            ) {
-                items(chatState.chatMessages) { message ->
-                    if(message.role == "user" || message.role == "assistant") {
-                        ChatBubble(
-                            message = message,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .padding(bottom = 16.dp),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        val message = chatState.fieldText
+                        if (message.isNotEmpty()) chatActions.sendMessage()
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.Send, "Send")
                     }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.tertiary
+                )
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            items(chatState.chatMessages) { message ->
+                if (message.role == "user" || message.role == "assistant") {
+                    ChatBubble(
+                        message = message,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

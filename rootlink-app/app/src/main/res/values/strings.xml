@@ -2,13 +2,11 @@
     <!-- App Name -->
     <string name="app_name">Rootlink</string>
 
-    <!-- Map tabs -->
-    <string name="map_explore">Explore</string>
-    <string name="map_map">Map</string>
-
     <!-- Screens -->
     <string name="screens_map">Map</string>
     <string name="screens_chat">Chat</string>
+    <string name="screens_home">Home</string>
+    <string name="screens_favourites">Favourites</string>
 
     <!-- Menu -->
     <string name="menu_drawer">Menu drawer</string>

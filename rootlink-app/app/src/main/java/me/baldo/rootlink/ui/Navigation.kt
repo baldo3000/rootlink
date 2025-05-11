@@ -1,6 +1,5 @@
 package me.baldo.rootlink.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -17,7 +16,13 @@ import org.koin.androidx.compose.koinViewModel
 
 sealed interface RootlinkRoute {
     @Serializable
+    data object Home : RootlinkRoute
+
+    @Serializable
     data object Map : RootlinkRoute
+
+    @Serializable
+    data object Favourites : RootlinkRoute
 
     @Serializable
     data object Chat : RootlinkRoute
@@ -35,14 +40,21 @@ fun RootlinkNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = RootlinkRoute.Map
     ) {
+        composable<RootlinkRoute.Home> {
+
+        }
+
         composable<RootlinkRoute.Map> {
-            Log.i("RootlinkNavGraph", "MapVM: $mapVM")
             MapScreen(
                 mapState = mapState,
                 mapActions = mapVM.actions,
                 openTreeChat = chatVM.actions::openTreeChat,
                 navController = navController
             )
+        }
+
+        composable<RootlinkRoute.Favourites> {
+
         }
 
         composable<RootlinkRoute.Chat> {

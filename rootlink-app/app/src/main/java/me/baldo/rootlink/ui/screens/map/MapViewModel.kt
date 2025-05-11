@@ -10,15 +10,11 @@ import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.data.repositories.MessagesRepository
 
-enum class MapTab { EXPLORE, MAP }
-
 data class MapState(
-    val tab: MapTab,
     val trees: List<Tree> = emptyList(),
 )
 
 interface ChatActions {
-    fun onTabChange(tab: MapTab)
     fun addTree(tree: Tree)
     fun addTrees(trees: List<Tree>)
     fun updateTrees(trees: List<Tree>)
@@ -27,7 +23,7 @@ interface ChatActions {
 class MapViewModel(
     private val messagesRepository: MessagesRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow(MapState(tab = MapTab.EXPLORE))
+    private val _state = MutableStateFlow(MapState())
     val state = _state.asStateFlow()
 
     init {
@@ -39,9 +35,6 @@ class MapViewModel(
     }
 
     val actions = object : ChatActions {
-        override fun onTabChange(tab: MapTab) {
-            _state.update { it.copy(tab = tab) }
-        }
 
         override fun addTree(tree: Tree) {
             _state.update { it.copy(trees = it.trees + tree) }

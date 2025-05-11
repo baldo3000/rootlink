@@ -1,25 +1,15 @@
 package me.baldo.rootlink.ui.screens.map
 
 import android.util.Log
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.outlined.Map
-import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -35,7 +25,8 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.ui.RootlinkRoute
-import me.baldo.rootlink.ui.composables.AppBarWithDrawer
+import me.baldo.rootlink.ui.composables.HomeOverlay
+import me.baldo.rootlink.ui.BottomBarTab
 import me.baldo.rootlink.utils.parseCoordinate
 
 @Composable
@@ -48,68 +39,28 @@ fun MapScreen(
 ) {
     val cameraPositionState = rememberCameraPositionState()
 
-    AppBarWithDrawer(
-        title = stringResource(R.string.screens_map)
-    ) { innerPadding ->
-        Scaffold(
-            modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
-            bottomBar = {
-                MapBottomBar(
-                    tab = mapState.tab,
-                    onTabClick = { mapActions.onTabChange(it) }
-                )
-            }
-        ) { innerPadding ->
-            when (mapState.tab) {
-                MapTab.EXPLORE -> Explore(
-                    trees = mapState.trees,
-                    cameraPositionState = cameraPositionState,
-                    onTreeClick = {
-                        openTreeChat(it.cardId)
-                        navController.navigate(RootlinkRoute.Chat)
-                    },
-                    modifier = modifier.padding(bottom = innerPadding.calculateBottomPadding())
-                )
-
-                MapTab.MAP -> Spacer(modifier.fillMaxSize())
+    HomeOverlay(
+        selectedTab = BottomBarTab.Map,
+        onBottomTabClick = { tab ->
+            if (tab != BottomBarTab.Map) {
+                navController.navigate(tab.screen)
             }
         }
-    }
-}
-
-@Composable
-private fun MapBottomBar(
-    tab: MapTab,
-    onTabClick: (MapTab) -> Unit,
-) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = if (tab == MapTab.EXPLORE) Icons.Filled.MyLocation else Icons.Outlined.MyLocation,
-                    contentDescription = stringResource(R.string.map_explore)
-                )
+    ) { innerPadding ->
+        Map(
+            trees = mapState.trees,
+            cameraPositionState = cameraPositionState,
+            onTreeClick = {
+                openTreeChat(it.cardId)
+                navController.navigate(RootlinkRoute.Chat)
             },
-            label = { Text(stringResource(R.string.map_explore)) },
-            selected = tab == MapTab.EXPLORE,
-            onClick = { onTabClick(MapTab.EXPLORE) }
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = if (tab == MapTab.MAP) Icons.Filled.Map else Icons.Outlined.Map,
-                    contentDescription = stringResource(R.string.map_explore)
-                )
-            },
-            label = { Text(stringResource(R.string.map_map)) },
-            selected = tab == MapTab.MAP,
-            onClick = { onTabClick(MapTab.MAP) }
+            modifier = modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
-private fun Explore(
+private fun Map(
     cameraPositionState: CameraPositionState,
     trees: List<Tree>,
     onTreeClick: (Tree) -> Unit,
