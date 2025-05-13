@@ -40,4 +40,8 @@
     <string name="map_internet_disabled_explanation">You need to be connected to the Internet in order to display the map</string>
     <string name="map_internet_disabled_button">Open Internet settings</string>
 
+    <string name="map_tree_info">Info</string>
+    <string name="map_tree_expand">Expand</string>
+    <string name="map_tree_chat">Chat</string>
+
 </resources>

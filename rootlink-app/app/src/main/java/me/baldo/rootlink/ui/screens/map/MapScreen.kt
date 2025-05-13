@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,14 +13,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.GpsOff
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.OpenWith
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +65,7 @@ import me.baldo.rootlink.utils.isOnline
 import me.baldo.rootlink.utils.openWirelessSettings
 import me.baldo.rootlink.utils.parseCoordinate
 import me.baldo.rootlink.utils.rememberMultiplePermissions
+import java.util.Locale
 
 @Composable
 fun MapScreen(
@@ -148,7 +161,7 @@ fun MapScreen(
                 Map(
                     trees = mapState.trees,
                     cameraPositionState = cameraPositionState,
-                    onTreeClick = {
+                    onTreeChatClick = {
                         openTreeChat(it.cardId)
                         navController.navigate(RootlinkRoute.Chat)
                     },
@@ -162,10 +175,12 @@ fun MapScreen(
 private fun Map(
     cameraPositionState: CameraPositionState,
     trees: List<Tree>,
-    onTreeClick: (Tree) -> Unit,
+    onTreeChatClick: (Tree) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
+    var selectedTree by remember { mutableStateOf<Tree?>(null) }
+    var showTreeDialog by remember { mutableStateOf(false) }
 
     GoogleMap(
         modifier = modifier.fillMaxSize(),
@@ -190,13 +205,9 @@ private fun Map(
             if (lat != null && lon != null) {
                 MarkerInfoWindowComposable(
                     state = rememberUpdatedMarkerState(LatLng(lat, lon)),
-                    onClick = {
-                        onTreeClick(tree)
-                        false
-                    },
-                    infoContent = {
-                        Text(tree.species)
-                    }
+                    onInfoWindowClick = { selectedTree = tree; showTreeDialog = true },
+                    onInfoWindowClose = { selectedTree = null },
+                    infoContent = { TreeInfoWindow(tree) }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.tree_sample),
@@ -209,6 +220,114 @@ private fun Map(
         val endTime = System.currentTimeMillis()
         Log.i("TIME", "Markers drawn in ${endTime - startTime} ms")
     }
+
+    // Show a dialog or bottom sheet when a tree is selected
+    selectedTree?.let { tree ->
+        if (showTreeDialog) {
+            TreeInfoDialog(
+                tree = tree,
+                onDismiss = { showTreeDialog = false },
+                onInfoClick = { },
+                onChatClick = {
+                    onTreeChatClick(tree)
+                    showTreeDialog = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun TreeInfoWindow(tree: Tree) {
+    Column(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .sizeIn(minWidth = 128.dp, minHeight = 64.dp, maxWidth = 256.dp, maxHeight = 160.dp)
+            .padding(12.dp),
+    ) {
+        Text(
+            text = tree.species.uppercase(),
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(Modifier.height(12.dp))
+        Text(
+            text = tree.location.replaceFirstChar { it.titlecase(Locale.getDefault()) },
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(Modifier.height(4.dp))
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+            ),
+            onClick = {}
+        ) {
+            Icon(
+                Icons.Outlined.OpenWith,
+                stringResource(R.string.map_tree_expand)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.map_tree_expand))
+        }
+
+    }
+}
+
+@Composable
+private fun TreeInfoDialog(
+    tree: Tree,
+    onDismiss: () -> Unit,
+    onInfoClick: () -> Unit,
+    onChatClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Column {
+                Text(text = tree.species.uppercase())
+                Text(
+                    text = tree.speciesScientificName,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        },
+        text = {
+            Text(text = tree.location.replaceFirstChar { it.titlecase(Locale.getDefault()) })
+        },
+        confirmButton = {
+            Button(
+                onClick = onChatClick
+            ) {
+                Icon(
+                    Icons.Outlined.OpenWith,
+                    stringResource(R.string.map_tree_chat)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.map_tree_chat))
+            }
+        },
+        dismissButton = {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                ),
+                onClick = onInfoClick
+            ) {
+                Icon(
+                    Icons.Outlined.Info,
+                    stringResource(R.string.map_tree_info)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.map_tree_info))
+            }
+        }
+    )
 }
 
 @Composable
