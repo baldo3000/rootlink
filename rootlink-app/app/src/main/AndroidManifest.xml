@@ -8,6 +8,18 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <queries>
+        <intent>
+            <action android:name="android.settings.LOCATION_SOURCE_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.APPLICATION_DETAILS_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.WIRELESS_SETTINGS" />
+        </intent>
+    </queries>
+
     <application
         android:name=".RootlinkApplication"
         android:allowBackup="true"

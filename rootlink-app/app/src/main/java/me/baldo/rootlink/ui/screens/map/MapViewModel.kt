@@ -12,12 +12,23 @@ import me.baldo.rootlink.data.repositories.MessagesRepository
 
 data class MapState(
     val trees: List<Tree> = emptyList(),
+
+    val showLocationDisabledWarning: Boolean = false,
+    val showLocationPermissionDeniedWarning: Boolean = false,
+    val showLocationPermissionPermanentlyDeniedWarning: Boolean = false,
+    val showNoInternetConnectivityWarning: Boolean = false
 )
 
 interface ChatActions {
     fun addTree(tree: Tree)
     fun addTrees(trees: List<Tree>)
     fun updateTrees(trees: List<Tree>)
+
+    fun setShowLocationDisabledWarning(show: Boolean)
+    fun setShowLocationPermissionDeniedWarning(show: Boolean)
+    fun setShowLocationPermissionPermanentlyDeniedWarning(show: Boolean)
+    fun setShowNoInternetConnectivityWarning(show: Boolean)
+    fun disableAllWarnings()
 }
 
 class MapViewModel(
@@ -46,6 +57,33 @@ class MapViewModel(
 
         override fun updateTrees(trees: List<Tree>) {
             _state.update { it.copy(trees = trees) }
+        }
+
+        override fun setShowLocationDisabledWarning(show: Boolean) {
+            _state.update { it.copy(showLocationDisabledWarning = show) }
+        }
+
+        override fun setShowLocationPermissionDeniedWarning(show: Boolean) {
+            _state.update { it.copy(showLocationPermissionDeniedWarning = show) }
+        }
+
+        override fun setShowLocationPermissionPermanentlyDeniedWarning(show: Boolean) {
+            _state.update { it.copy(showLocationPermissionPermanentlyDeniedWarning = show) }
+        }
+
+        override fun setShowNoInternetConnectivityWarning(show: Boolean) {
+            _state.update { it.copy(showNoInternetConnectivityWarning = show) }
+        }
+
+        override fun disableAllWarnings() {
+            _state.update {
+                it.copy(
+                    showLocationDisabledWarning = false,
+                    showLocationPermissionDeniedWarning = false,
+                    showLocationPermissionPermanentlyDeniedWarning = false,
+                    showNoInternetConnectivityWarning = false
+                )
+            }
         }
     }
 }
