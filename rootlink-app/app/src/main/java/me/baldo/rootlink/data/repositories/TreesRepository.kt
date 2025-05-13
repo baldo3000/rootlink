@@ -4,7 +4,7 @@ import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.data.database.TreesDAO
 
-class MessagesRepository(
+class TreesRepository(
     private val treesDAO: TreesDAO
 ) {
     suspend fun getChatMessagesForTree(treeId: String) = treesDAO.getChatMessagesOfTree(treeId)

@@ -161,6 +161,9 @@ fun MapScreen(
                 Map(
                     trees = mapState.trees,
                     cameraPositionState = cameraPositionState,
+                    onTreeInfoClick = {
+                        navController.navigate(RootlinkRoute.TreeInfo(it.cardId))
+                    },
                     onTreeChatClick = {
                         openTreeChat(it.cardId)
                         navController.navigate(RootlinkRoute.Chat)
@@ -175,6 +178,7 @@ fun MapScreen(
 private fun Map(
     cameraPositionState: CameraPositionState,
     trees: List<Tree>,
+    onTreeInfoClick: (Tree) -> Unit,
     onTreeChatClick: (Tree) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -227,7 +231,11 @@ private fun Map(
             TreeInfoDialog(
                 tree = tree,
                 onDismiss = { showTreeDialog = false },
-                onInfoClick = { },
+                onInfoClick = {
+                    showTreeDialog = false
+                    onTreeInfoClick(tree)
+                    selectedTree = null
+                },
                 onChatClick = {
                     onTreeChatClick(tree)
                     showTreeDialog = false

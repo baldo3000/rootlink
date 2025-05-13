@@ -7,7 +7,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import me.baldo.rootlink.data.database.Tree
-import me.baldo.rootlink.data.repositories.MessagesRepository
+import me.baldo.rootlink.data.repositories.TreesRepository
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -25,7 +25,7 @@ class RootlinkApplication : Application() {
             modules(appModule)
         }
 
-        val messagesRepository: MessagesRepository by inject()
+        val treesRepository: TreesRepository by inject()
 
         val rawResources = listOf(
             R.raw.trees_emilia_romagna,
@@ -40,7 +40,7 @@ class RootlinkApplication : Application() {
                 .use { it.readText() }
             json.decodeFromString<List<Tree>>(text).forEach { tree ->
                 applicationScope.launch {
-                    messagesRepository.upsertTree(tree)
+                    treesRepository.upsertTree(tree)
                 }
             }
         }

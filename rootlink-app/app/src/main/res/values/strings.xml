@@ -5,6 +5,7 @@
     <!-- Screens -->
     <string name="screen_map">Map</string>
     <string name="screen_chat">Chat</string>
+    <string name="screen_tree_info">Tree info</string>
     <string name="screen_home">Home</string>
     <string name="screen_favourites">Favourites</string>
 
@@ -43,5 +44,35 @@
     <string name="map_tree_info">Info</string>
     <string name="map_tree_expand">Expand</string>
     <string name="map_tree_chat">Chat</string>
+
+    <!-- Tree Info -->
+    <string name="tree_info_section_identification">Identification &amp; Location</string>
+    <string name="tree_info_section_coordinates">Coordinates &amp; Altitude</string>
+    <string name="tree_info_section_species">Species Information</string>
+    <string name="tree_info_section_measurements">Measurements</string>
+    <string name="tree_info_section_other">Other</string>
+
+    <string name="tree_info_yes">Yes</string>
+    <string name="tree_info_no">No</string>
+    <string name="tree_info_unknown">Unknown Tree</string>
+
+    <string name="tree_info_action_collapse">Collapse</string>
+    <string name="tree_info_action_expand">Expand</string>
+
+    <string name="tree_info_value_id">CardID</string>
+    <string name="tree_info_value_region">Region</string>
+    <string name="tree_info_value_province">Province</string>
+    <string name="tree_info_value_municipality">Municipality</string>
+    <string name="tree_info_value_location">Location</string>
+    <string name="tree_info_value_latitude">Latitude</string>
+    <string name="tree_info_value_longitude">Longitude</string>
+    <string name="tree_info_value_altitude">Altitude</string>
+    <string name="tree_info_value_species">Common Name</string>
+    <string name="tree_info_value_species_scientific">Scientific Name</string>
+    <string name="tree_info_value_circumference">Circumference (cm)</string>
+    <string name="tree_info_value_height">Height (m)</string>
+    <string name="tree_info_value_age">Age</string>
+    <string name="tree_info_value_monumentality_criteria">Monumentality Criteria</string>
+    <string name="tree_info_value_public_interest">Significant Public Interest</string>
 
 </resources>

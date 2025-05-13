@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.Tree
-import me.baldo.rootlink.data.repositories.MessagesRepository
+import me.baldo.rootlink.data.repositories.TreesRepository
 
 data class MapState(
     val trees: List<Tree> = emptyList(),
@@ -32,14 +32,14 @@ interface ChatActions {
 }
 
 class MapViewModel(
-    private val messagesRepository: MessagesRepository
+    private val treesRepository: TreesRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val trees = messagesRepository.getTrees()
+            val trees = treesRepository.getTrees()
             Log.i("MapViewModel", "Loaded ${trees.size} trees")
             _state.update { it.copy(trees = trees) }
         }

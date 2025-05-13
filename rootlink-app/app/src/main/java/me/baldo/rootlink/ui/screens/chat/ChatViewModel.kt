@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.data.remote.MessagesDataSource
-import me.baldo.rootlink.data.repositories.MessagesRepository
+import me.baldo.rootlink.data.repositories.TreesRepository
 import java.util.Date
 
 data class ChatState(
@@ -25,7 +25,7 @@ interface ChatActions {
 }
 
 class ChatViewModel(
-    private val messagesRepository: MessagesRepository,
+    private val treesRepository: TreesRepository,
     private val messagesDataSource: MessagesDataSource
 ) : ViewModel() {
     private val _state = MutableStateFlow<ChatState>(ChatState())
@@ -33,8 +33,8 @@ class ChatViewModel(
     val actions = object : ChatActions {
         override fun openTreeChat(cardId: String) {
             viewModelScope.launch {
-                val tree = messagesRepository.getTree(cardId)
-                val treeWithChatMessages = messagesRepository.getChatMessagesForTree(cardId)
+                val tree = treesRepository.getTree(cardId)
+                val treeWithChatMessages = treesRepository.getChatMessagesForTree(cardId)
                 val messages = treeWithChatMessages.chatMessages.let {
                     if (it.isEmpty()) {
                         listOf(
@@ -69,13 +69,13 @@ class ChatViewModel(
             _state.update { it.copy(chatMessages = it.chatMessages + message, fieldText = "") }
             // Update database
             viewModelScope.launch {
-                messagesRepository.insertChatMessage(message)
+                treesRepository.insertChatMessage(message)
             }
             // Send message to the server and wait for response
             viewModelScope.launch {
                 val responseMessage = messagesDataSource.sendMessage(_state.value.chatMessages)
                 _state.update { it.copy(chatMessages = it.chatMessages + responseMessage) }
-                messagesRepository.insertChatMessage(responseMessage)
+                treesRepository.insertChatMessage(responseMessage)
             }
         }
 

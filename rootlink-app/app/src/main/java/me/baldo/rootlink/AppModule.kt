@@ -9,9 +9,10 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import me.baldo.rootlink.data.database.RootlinkLocalDatabase
 import me.baldo.rootlink.data.remote.MessagesDataSource
-import me.baldo.rootlink.data.repositories.MessagesRepository
+import me.baldo.rootlink.data.repositories.TreesRepository
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapViewModel
+import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import java.security.SecureRandom
@@ -25,6 +26,7 @@ val appModule = module {
 
     viewModel { ChatViewModel(get(), get()) }
     viewModel { MapViewModel(get()) }
+    viewModel { TreeInfoViewModel(get()) }
 
     single {
         Room.databaseBuilder(
@@ -36,7 +38,7 @@ val appModule = module {
             .fallbackToDestructiveMigration(true)
             .build()
     }
-    single { MessagesRepository(get<RootlinkLocalDatabase>().treesDAO()) }
+    single { TreesRepository(get<RootlinkLocalDatabase>().treesDAO()) }
 
     single {
         HttpClient(OkHttp) {
