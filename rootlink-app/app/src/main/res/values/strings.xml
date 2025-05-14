@@ -44,6 +44,7 @@
     <string name="map_tree_info">Info</string>
     <string name="map_tree_expand">Expand</string>
     <string name="map_tree_chat">Chat</string>
+    <string name="map_tree_chat_disabled">Get closer to chat</string>
     <string name="map_follow_user">Follow user</string>
     <string name="map_unfollow_user">Unfollow user</string>
 

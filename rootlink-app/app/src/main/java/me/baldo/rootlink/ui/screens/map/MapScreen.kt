@@ -62,6 +62,7 @@ import com.google.android.gms.location.LocationServices.getFusedLocationProvider
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -78,11 +79,14 @@ import me.baldo.rootlink.ui.RootlinkRoute
 import me.baldo.rootlink.ui.composables.HomeOverlay
 import me.baldo.rootlink.utils.LocationService
 import me.baldo.rootlink.utils.PermissionStatus
+import me.baldo.rootlink.utils.calculateDistance
 import me.baldo.rootlink.utils.isOnline
 import me.baldo.rootlink.utils.openWirelessSettings
 import me.baldo.rootlink.utils.parseCoordinate
 import me.baldo.rootlink.utils.rememberMultiplePermissions
 import java.util.Locale
+
+private const val INTERACTION_DISTANCE = 250.0
 
 @Composable
 fun MapScreen(
@@ -208,21 +212,25 @@ private fun Map(
     val locationService = remember { LocationService(ctx) }
     val scope = rememberCoroutineScope()
     var selectedTree by remember { mutableStateOf<Tree?>(null) }
+    var selectedTreePosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
     var showTreeDialog by remember { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState()
+    val userPosition = rememberCameraPositionState()
     val fusedLocationClient = remember { getFusedLocationProviderClient(ctx) }
     val currentIsFollowingUser by rememberUpdatedState(isFollowingUser)
     val locationCallback = remember {
         object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations.reversed()) {
-                    if (location != null && currentIsFollowingUser) {
-                        cameraPositionState.position = CameraPosition(
+                    if (location != null) {
+                        val position = CameraPosition(
                             LatLng(location.latitude, location.longitude),
                             cameraPositionState.position.zoom,
                             cameraPositionState.position.tilt,
                             0f
                         )
+                        if (currentIsFollowingUser) cameraPositionState.position = position
+                        userPosition.position = position
                         return
                     }
                 }
@@ -296,6 +304,15 @@ private fun Map(
             ),
             mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM
         ) {
+            // Draw a black circle around the user's location
+            Circle(
+                center = userPosition.position.target,
+                radius = INTERACTION_DISTANCE,
+                fillColor = Color.Black.copy(alpha = 0.1f),
+                strokeColor = Color.Black,
+                strokeWidth = 3f
+            )
+
             val startTime = System.currentTimeMillis()
             for (tree in trees) {
                 val lat: Double? =
@@ -305,7 +322,8 @@ private fun Map(
                 if (lat != null && lon != null) {
                     MarkerInfoWindowComposable(
                         state = rememberUpdatedMarkerState(LatLng(lat, lon)),
-                        onClick = {
+                        onClick = { marker ->
+                            selectedTreePosition = marker.position
                             selectedTree = tree
                             showTreeDialog = currentIsFollowingUser
                             currentIsFollowingUser
@@ -337,6 +355,10 @@ private fun Map(
             if (showTreeDialog) {
                 TreeInfoDialog(
                     tree = tree,
+                    chatEnabled = calculateDistance(
+                        userPosition.position.target,
+                        selectedTreePosition
+                    ) <= INTERACTION_DISTANCE,
                     onDismiss = { showTreeDialog = false },
                     onInfoClick = {
                         showTreeDialog = false
@@ -425,6 +447,7 @@ private fun TreeInfoWindow(tree: Tree) {
 @Composable
 private fun TreeInfoDialog(
     tree: Tree,
+    chatEnabled: Boolean,
     onDismiss: () -> Unit,
     onInfoClick: () -> Unit,
     onChatClick: () -> Unit
@@ -444,15 +467,19 @@ private fun TreeInfoDialog(
             Text(text = tree.location.replaceFirstChar { it.titlecase(Locale.getDefault()) })
         },
         confirmButton = {
+            val text =
+                if (chatEnabled) stringResource(R.string.map_tree_chat)
+                else stringResource(R.string.map_tree_chat_disabled)
             Button(
+                // enabled = chatEnabled,
                 onClick = onChatClick
             ) {
                 Icon(
                     Icons.Outlined.OpenWith,
-                    stringResource(R.string.map_tree_chat)
+                    text
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.map_tree_chat))
+                Text(text)
             }
         },
         dismissButton = {
