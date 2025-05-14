@@ -44,6 +44,8 @@
     <string name="map_tree_info">Info</string>
     <string name="map_tree_expand">Expand</string>
     <string name="map_tree_chat">Chat</string>
+    <string name="map_follow_user">Follow user</string>
+    <string name="map_unfollow_user">Unfollow user</string>
 
     <!-- Tree Info -->
     <string name="tree_info_section_identification">Identification &amp; Location</string>

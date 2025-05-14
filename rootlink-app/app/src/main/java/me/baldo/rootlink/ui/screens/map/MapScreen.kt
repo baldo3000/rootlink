@@ -2,7 +2,9 @@ package me.baldo.rootlink.ui.screens.map
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.compose.foundation.background
@@ -18,19 +20,27 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.GpsFixed
+import androidx.compose.material.icons.outlined.GpsNotFixed
 import androidx.compose.material.icons.outlined.GpsOff
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.OpenWith
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +51,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavHostController
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -55,11 +70,13 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.ui.BottomBarTab
 import me.baldo.rootlink.ui.RootlinkRoute
 import me.baldo.rootlink.ui.composables.HomeOverlay
+import me.baldo.rootlink.utils.LocationService
 import me.baldo.rootlink.utils.PermissionStatus
 import me.baldo.rootlink.utils.isOnline
 import me.baldo.rootlink.utils.openWirelessSettings
@@ -76,7 +93,6 @@ fun MapScreen(
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
-    val cameraPositionState = rememberCameraPositionState()
 
     val locationPermissions = rememberMultiplePermissions(
         listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -160,7 +176,10 @@ fun MapScreen(
             else ->
                 Map(
                     trees = mapState.trees,
-                    cameraPositionState = cameraPositionState,
+                    isFollowingUser = mapState.isFollowingUser,
+                    setFollowUser = mapActions::setFollowingUser,
+                    isLoaded = mapState.isLoaded,
+                    markAsLoaded = mapActions::markAsLoaded,
                     onTreeInfoClick = {
                         navController.navigate(RootlinkRoute.TreeInfo(it.cardId))
                     },
@@ -176,72 +195,189 @@ fun MapScreen(
 
 @Composable
 private fun Map(
-    cameraPositionState: CameraPositionState,
     trees: List<Tree>,
+    isFollowingUser: Boolean,
+    setFollowUser: (Boolean) -> Unit,
+    isLoaded: Boolean,
+    markAsLoaded: () -> Unit,
     onTreeInfoClick: (Tree) -> Unit,
     onTreeChatClick: (Tree) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
+    val locationService = remember { LocationService(ctx) }
+    val scope = rememberCoroutineScope()
     var selectedTree by remember { mutableStateOf<Tree?>(null) }
     var showTreeDialog by remember { mutableStateOf(false) }
-
-    GoogleMap(
-        modifier = modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties = MapProperties(
-            isMyLocationEnabled = true,
-            mapType = MapType.NORMAL,
-            mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style)
-        ),
-        uiSettings = MapUiSettings(
-            mapToolbarEnabled = false,
-            zoomControlsEnabled = false
-        ),
-        mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM
-    ) {
-        val startTime = System.currentTimeMillis()
-        for (tree in trees) {
-            val lat: Double? =
-                runCatching { parseCoordinate(tree.latitude) }.getOrElse { null }
-            val lon: Double? =
-                runCatching { parseCoordinate(tree.longitude) }.getOrElse { null }
-            if (lat != null && lon != null) {
-                MarkerInfoWindowComposable(
-                    state = rememberUpdatedMarkerState(LatLng(lat, lon)),
-                    onInfoWindowClick = { selectedTree = tree; showTreeDialog = true },
-                    onInfoWindowClose = { selectedTree = null },
-                    infoContent = { TreeInfoWindow(tree) }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.tree_sample),
-                        contentDescription = tree.species,
-                        tint = Color.Unspecified
-                    )
+    val cameraPositionState = rememberCameraPositionState()
+    val fusedLocationClient = remember { getFusedLocationProviderClient(ctx) }
+    val currentIsFollowingUser by rememberUpdatedState(isFollowingUser)
+    val locationCallback = remember {
+        object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations.reversed()) {
+                    if (location != null && currentIsFollowingUser) {
+                        cameraPositionState.position = CameraPosition(
+                            LatLng(location.latitude, location.longitude),
+                            cameraPositionState.position.zoom,
+                            cameraPositionState.position.tilt,
+                            0f
+                        )
+                        return
+                    }
                 }
             }
         }
-        val endTime = System.currentTimeMillis()
-        Log.i("TIME", "Markers drawn in ${endTime - startTime} ms")
     }
 
-    // Show a dialog or bottom sheet when a tree is selected
-    selectedTree?.let { tree ->
-        if (showTreeDialog) {
-            TreeInfoDialog(
-                tree = tree,
-                onDismiss = { showTreeDialog = false },
-                onInfoClick = {
-                    showTreeDialog = false
-                    onTreeInfoClick(tree)
-                    selectedTree = null
-                },
-                onChatClick = {
-                    onTreeChatClick(tree)
-                    showTreeDialog = false
-                }
+    // Start location updates when entering the Map route
+    LaunchedEffect(Unit) {
+        if (ActivityCompat.checkSelfPermission(
+                ctx,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.requestLocationUpdates(
+                LocationRequest.Builder(1000L).build(),
+                locationCallback,
+                Looper.getMainLooper()
             )
         }
+    }
+
+    // Stop location updates when exiting the Map route
+    DisposableEffect(Unit) {
+        onDispose {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            if (isFollowingUser) {
+                FollowingUserFAB {
+                    setFollowUser(false)
+                }
+            } else {
+                NotFollowingUserFAB {
+                    scope.launch {
+                        locationService.getCurrentLocation()?.let { newPosition ->
+                            cameraPositionState.position = CameraPosition(
+                                LatLng(newPosition.latitude, newPosition.longitude),
+                                cameraPositionState.position.zoom,
+                                cameraPositionState.position.tilt,
+                                0f
+                            )
+                        }
+                    }
+                    setFollowUser(true)
+                }
+            }
+        }
+    ) { innerPadding ->
+        val tmp = innerPadding
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                isMyLocationEnabled = true,
+                mapType = MapType.NORMAL,
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style),
+                minZoomPreference = 6f
+            ),
+            uiSettings = MapUiSettings(
+                scrollGesturesEnabled = !currentIsFollowingUser,
+                scrollGesturesEnabledDuringRotateOrZoom = !currentIsFollowingUser,
+                rotationGesturesEnabled = !currentIsFollowingUser,
+                myLocationButtonEnabled = false,
+                mapToolbarEnabled = false,
+                zoomControlsEnabled = false
+            ),
+            mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM
+        ) {
+            val startTime = System.currentTimeMillis()
+            for (tree in trees) {
+                val lat: Double? =
+                    runCatching { parseCoordinate(tree.latitude) }.getOrElse { null }
+                val lon: Double? =
+                    runCatching { parseCoordinate(tree.longitude) }.getOrElse { null }
+                if (lat != null && lon != null) {
+                    MarkerInfoWindowComposable(
+                        state = rememberUpdatedMarkerState(LatLng(lat, lon)),
+                        onClick = {
+                            selectedTree = tree
+                            showTreeDialog = currentIsFollowingUser
+                            currentIsFollowingUser
+                        },
+                        onInfoWindowClick = { selectedTree = tree; showTreeDialog = true },
+                        onInfoWindowClose = { selectedTree = null },
+                        infoContent = { TreeInfoWindow(tree) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.tree_sample),
+                            contentDescription = tree.species,
+                            tint = Color.Unspecified
+                        )
+                    }
+                }
+            }
+            val endTime = System.currentTimeMillis()
+            Log.i("TIME", "Markers drawn in ${endTime - startTime} ms")
+        }
+
+        // The first time the map is loaded camera position is configured
+        if (!isLoaded) {
+            cameraPositionState.position =
+                CameraPosition(LatLng(42.7189196, 12.8998566), 6f, 0f, 0f)
+            markAsLoaded()
+        }
+        // Show a dialog or bottom sheet when a tree is selected
+        selectedTree?.let { tree ->
+            if (showTreeDialog) {
+                TreeInfoDialog(
+                    tree = tree,
+                    onDismiss = { showTreeDialog = false },
+                    onInfoClick = {
+                        showTreeDialog = false
+                        onTreeInfoClick(tree)
+                    },
+                    onChatClick = {
+                        showTreeDialog = false
+                        onTreeChatClick(tree)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FollowingUserFAB(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onClick,
+    ) {
+        Icon(
+            Icons.Outlined.GpsFixed,
+            stringResource(R.string.map_unfollow_user)
+        )
+    }
+}
+
+@Composable
+private fun NotFollowingUserFAB(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Icon(
+            Icons.Outlined.GpsNotFixed,
+            stringResource(R.string.map_follow_user)
+        )
     }
 }
 
