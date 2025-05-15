@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,15 +61,16 @@ import com.google.android.gms.location.LocationServices.getFusedLocationProvider
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerInfoWindowComposable
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.Tree
@@ -82,7 +82,6 @@ import me.baldo.rootlink.utils.PermissionStatus
 import me.baldo.rootlink.utils.calculateDistance
 import me.baldo.rootlink.utils.isOnline
 import me.baldo.rootlink.utils.openWirelessSettings
-import me.baldo.rootlink.utils.parseCoordinate
 import me.baldo.rootlink.utils.rememberMultiplePermissions
 import java.util.Locale
 
@@ -197,6 +196,7 @@ fun MapScreen(
     }
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
     trees: List<Tree>,
@@ -211,8 +211,7 @@ private fun Map(
     val ctx = LocalContext.current
     val locationService = remember { LocationService(ctx) }
     val scope = rememberCoroutineScope()
-    var selectedTree by remember { mutableStateOf<Tree?>(null) }
-    var selectedTreePosition by remember { mutableStateOf(LatLng(0.0, 0.0)) }
+    var selectedTree by remember { mutableStateOf<Tree>(Tree()) }
     var showTreeDialog by remember { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState()
     val userPosition = rememberCameraPositionState()
@@ -313,35 +312,22 @@ private fun Map(
                 strokeWidth = 3f
             )
 
-            val startTime = System.currentTimeMillis()
-            for (tree in trees) {
-                val lat: Double? =
-                    runCatching { parseCoordinate(tree.latitude) }.getOrElse { null }
-                val lon: Double? =
-                    runCatching { parseCoordinate(tree.longitude) }.getOrElse { null }
-                if (lat != null && lon != null) {
-                    MarkerInfoWindowComposable(
-                        state = rememberUpdatedMarkerState(LatLng(lat, lon)),
-                        onClick = { marker ->
-                            selectedTreePosition = marker.position
-                            selectedTree = tree
-                            showTreeDialog = currentIsFollowingUser
-                            currentIsFollowingUser
-                        },
-                        onInfoWindowClick = { selectedTree = tree; showTreeDialog = true },
-                        onInfoWindowClose = { selectedTree = null },
-                        infoContent = { TreeInfoWindow(tree) }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.tree_sample),
-                            contentDescription = tree.species,
-                            tint = Color.Unspecified
-                        )
-                    }
+            // Draw trees in clusters
+            Clustering(
+                items = trees,
+                onClusterItemClick = { tree ->
+                    selectedTree = tree
+                    showTreeDialog = true
+                    isFollowingUser
+                },
+                clusterItemContent = { tree ->
+                    Icon(
+                        painter = painterResource(R.drawable.tree_sample),
+                        contentDescription = tree.species,
+                        tint = Color.Unspecified
+                    )
                 }
-            }
-            val endTime = System.currentTimeMillis()
-            Log.i("TIME", "Markers drawn in ${endTime - startTime} ms")
+            )
         }
 
         // The first time the map is loaded camera position is configured
@@ -357,7 +343,7 @@ private fun Map(
                     tree = tree,
                     chatEnabled = calculateDistance(
                         userPosition.position.target,
-                        selectedTreePosition
+                        selectedTree.position
                     ) <= INTERACTION_DISTANCE,
                     onDismiss = { showTreeDialog = false },
                     onInfoClick = {
@@ -536,4 +522,23 @@ private fun Warning(
             Text(buttonText)
         }
     }
+}
+
+data class MyItem(
+    val itemPosition: LatLng,
+    val itemTitle: String,
+    val itemSnippet: String,
+    val itemZIndex: Float,
+) : ClusterItem {
+    override fun getPosition(): LatLng =
+        itemPosition
+
+    override fun getTitle(): String =
+        itemTitle
+
+    override fun getSnippet(): String =
+        itemSnippet
+
+    override fun getZIndex(): Float =
+        itemZIndex
 }

@@ -4,46 +4,50 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.baldo.rootlink.utils.parseCoordinate
 import java.util.Date
 import java.util.UUID
+import kotlin.Double.Companion.NaN
 
 @Entity
 @Serializable
 data class Tree(
     @PrimaryKey
     @SerialName("cardId")
-    val cardId: String,
+    val cardId: String = "",
     @SerialName("region")
-    val region: String,
+    val region: String = "",
     @SerialName("province")
-    val province: String,
+    val province: String = "",
     @SerialName("municipality")
-    val municipality: String,
+    val municipality: String = "",
     @SerialName("location")
-    val location: String,
+    val location: String = "",
     @SerialName("latitude")
-    val latitude: String,
+    val latitude: String = "",
     @SerialName("longitude")
-    val longitude: String,
+    val longitude: String = "",
     @SerialName("altitude")
-    val altitude: Double,
+    val altitude: Double = NaN,
     @SerialName("urban")
-    val urban: Boolean,
+    val urban: Boolean = false,
     @SerialName("speciesScientificName")
-    val speciesScientificName: String,
+    val speciesScientificName: String = "",
     @SerialName("species")
-    val species: String,
+    val species: String = "",
     @SerialName("circumference")
-    val circumference: Double,
+    val circumference: Double = NaN,
     @SerialName("height")
-    val height: Double,
+    val height: Double = NaN,
     @SerialName("monumentalityCriteria")
-    val monumentalityCriteria: String,
+    val monumentalityCriteria: String = "",
     @SerialName("significantPublicInterest")
-    val significantPublicInterest: Boolean,
-) {
+    val significantPublicInterest: Boolean = false,
+) : ClusterItem {
     override fun equals(other: Any?): Boolean {
         return if (other is Tree) {
             this.cardId == other.cardId
@@ -52,10 +56,7 @@ data class Tree(
         }
     }
 
-    override fun hashCode(): Int {
-        var result = cardId.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = cardId.hashCode()
 
     fun generateAIPrompt(): String {
         return """
@@ -72,6 +73,15 @@ data class Tree(
             Rispondi nella lingua in cui ti viene posta la prima domanda.
             """.trimIndent()
     }
+
+    override fun getPosition(): LatLng =
+        LatLng(parseCoordinate(latitude), parseCoordinate(longitude))
+
+    override fun getTitle(): String? = null
+
+    override fun getSnippet(): String? = null
+
+    override fun getZIndex(): Float? = 0f
 }
 
 @Entity
