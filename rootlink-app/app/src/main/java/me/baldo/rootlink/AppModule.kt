@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import me.baldo.rootlink.data.database.RootlinkLocalDatabase
+import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
 import me.baldo.rootlink.data.repositories.TreesRepository
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
@@ -23,6 +24,7 @@ import javax.net.ssl.X509TrustManager
 
 val appModule = module {
     single { MessagesDataSource(get()) }
+    single { AirQualityDataSource(get()) }
 
     viewModel { ChatViewModel(get(), get()) }
     viewModel { MapViewModel(get()) }

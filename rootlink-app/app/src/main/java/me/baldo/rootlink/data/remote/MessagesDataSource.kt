@@ -38,10 +38,10 @@ private data class Message(
 }
 
 @Serializable
-private data class RequestMessage(val messages: List<Message>)
+private data class ChatRequestMessage(val messages: List<Message>)
 
 @Serializable
-private data class ResponseMessage(val responseMessage: Message)
+private data class ChatResponseMessage(val responseMessage: Message)
 
 class MessagesDataSource(
     private val httpClient: HttpClient
@@ -57,8 +57,8 @@ class MessagesDataSource(
         val answer = try {
             httpClient.post(url) {
                 contentType(ContentType.Application.Json)
-                setBody(RequestMessage(messages.toMessages()))
-            }.body<ResponseMessage>().responseMessage
+                setBody(ChatRequestMessage(messages.toMessages()))
+            }.body<ChatResponseMessage>().responseMessage
         } catch (e: Exception) {
             Log.e(TAG, "Error while sending message: ${e.message}")
             Message(
