@@ -92,6 +92,7 @@ fun MapScreen(
     mapState: MapState,
     mapActions: ChatActions,
     openTreeChat: (String) -> Unit,
+    showAllTrees: Boolean,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -139,7 +140,8 @@ fun MapScreen(
             if (tab != BottomBarTab.Map) {
                 navController.navigate(tab.screen)
             }
-        }
+        },
+        navController = navController
     ) { innerPadding ->
         when {
             mapState.showLocationPermissionDeniedWarning ->
@@ -178,7 +180,7 @@ fun MapScreen(
 
             else ->
                 Map(
-                    trees = mapState.trees,
+                    trees = mapState.trees.filter { it.significantPublicInterest || showAllTrees },
                     isFollowingUser = mapState.isFollowingUser,
                     setFollowUser = mapActions::setFollowingUser,
                     isLoaded = mapState.isLoaded,

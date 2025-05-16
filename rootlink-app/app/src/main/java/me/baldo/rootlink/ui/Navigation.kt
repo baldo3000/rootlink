@@ -13,6 +13,8 @@ import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapScreen
 import me.baldo.rootlink.ui.screens.map.MapViewModel
+import me.baldo.rootlink.ui.screens.settings.SettingsScreen
+import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoScreen
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -32,6 +34,9 @@ sealed interface RootlinkRoute {
 
     @Serializable
     data class TreeInfo(val tree: String) : RootlinkRoute
+
+    @Serializable
+    data object Settings : RootlinkRoute
 }
 
 @Composable
@@ -43,6 +48,8 @@ fun RootlinkNavGraph(navController: NavHostController) {
     val chatState by chatVM.state.collectAsStateWithLifecycle()
     val treeInfoVM = koinViewModel<TreeInfoViewModel>()
     val treeInfoState by treeInfoVM.state.collectAsStateWithLifecycle()
+    val settingsVM = koinViewModel<SettingsViewModel>()
+    val settingsState by settingsVM.state.collectAsStateWithLifecycle()
 
     NavHost(
         navController = navController,
@@ -56,6 +63,7 @@ fun RootlinkNavGraph(navController: NavHostController) {
             MapScreen(
                 mapState = mapState,
                 mapActions = mapVM.actions,
+                showAllTrees = settingsState.showAllMonumentalTrees,
                 openTreeChat = chatVM.actions::openTreeChat,
                 navController = navController
             )
@@ -80,6 +88,14 @@ fun RootlinkNavGraph(navController: NavHostController) {
             TreeInfoScreen(
                 treeInfoState = treeInfoState,
                 treeInfoActions = treeInfoVM.actions,
+                navController = navController
+            )
+        }
+
+        composable<RootlinkRoute.Settings> {
+            SettingsScreen(
+                settingsState = settingsState,
+                settingsActions = settingsVM.actions,
                 navController = navController
             )
         }

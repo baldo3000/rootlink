@@ -32,14 +32,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
 import me.baldo.rootlink.ui.BottomBarTab
+import me.baldo.rootlink.ui.RootlinkRoute
 
 @Composable
 fun HomeOverlay(
     selectedTab: BottomBarTab,
     onBottomTabClick: (BottomBarTab) -> Unit,
+    navController: NavHostController,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -138,7 +141,10 @@ fun HomeOverlay(
                                 contentDescription = stringResource(R.string.menu_item_settings)
                             )
                         },
-                        onClick = { /* TODO: handle click */ }
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(RootlinkRoute.Settings)
+                        }
                     )
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.menu_item_help)) },
