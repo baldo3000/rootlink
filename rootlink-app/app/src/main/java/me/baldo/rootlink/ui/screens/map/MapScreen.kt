@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,6 +59,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.compose.Circle
@@ -289,6 +289,10 @@ private fun Map(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 isMyLocationEnabled = true,
+                latLngBoundsForCameraTarget = LatLngBounds(
+                    LatLng(36.331253, 6.505598),
+                    LatLng(47.224792, 18.774244)
+                ),
                 mapType = MapType.NORMAL,
                 mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style),
                 minZoomPreference = 6f
@@ -320,13 +324,13 @@ private fun Map(
                     showTreeDialog = true
                     isFollowingUser
                 },
-                clusterItemContent = { tree ->
-                    Icon(
-                        painter = painterResource(R.drawable.tree_sample),
-                        contentDescription = tree.species,
-                        tint = Color.Unspecified
-                    )
-                }
+                // clusterItemContent = { tree ->
+                //     Icon(
+                //         painter = painterResource(R.drawable.tree),
+                //         contentDescription = tree.species,
+                //         tint = Color.Unspecified
+                //     )
+                // }
             )
         }
 
