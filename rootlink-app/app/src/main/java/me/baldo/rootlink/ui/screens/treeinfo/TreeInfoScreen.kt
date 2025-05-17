@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.baldo.rootlink.R
-import me.baldo.rootlink.ui.screens.chat.TopBar
+import me.baldo.rootlink.ui.composables.TopBar
 import java.util.Locale
 
 @Composable
@@ -46,6 +46,7 @@ fun TreeInfoScreen(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             TopBar(
                 title = stringResource(R.string.screen_tree_info),

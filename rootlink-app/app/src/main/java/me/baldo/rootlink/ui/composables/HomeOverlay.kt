@@ -164,6 +164,7 @@ fun HomeOverlay(
         gesturesEnabled = drawerState.isOpen
     ) {
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             topBar = {
                 HomeTopBar(
                     title = selectedTab.toString(),

@@ -34,6 +34,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.ChatMessage
+import me.baldo.rootlink.ui.composables.TopBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,6 +53,7 @@ fun ChatScreen(
         }
     }
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             TopBar(
                 title = stringResource(R.string.screen_chat),
