@@ -100,15 +100,14 @@ fun MapScreen(
     val locationPermissions = rememberMultiplePermissions(
         listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     ) { statuses ->
+        mapActions.disableAllWarnings()
         when {
             statuses.any { it.value == PermissionStatus.Granted } -> {}
             statuses.all { it.value == PermissionStatus.PermanentlyDenied } -> {
-                mapActions.disableAllWarnings()
                 mapActions.setShowLocationPermissionPermanentlyDeniedWarning(true)
             }
 
             else -> {
-                mapActions.disableAllWarnings()
                 mapActions.setShowLocationPermissionDeniedWarning(true)
             }
         }
@@ -116,7 +115,8 @@ fun MapScreen(
 
     fun update() {
         mapActions.setShowNoInternetConnectivityWarning(!isOnline(ctx))
-        if (locationPermissions.statuses.any { !it.value.isGranted }) {
+        locationPermissions.updateStatuses()
+        if (locationPermissions.statuses.all { !it.value.isGranted }) {
             if (locationPermissions.shouldShowRequestPermissionRationale()) {
                 mapActions.setShowLocationPermissionDeniedWarning(true)
             } else {
@@ -129,7 +129,7 @@ fun MapScreen(
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        locationPermissions.updateStatuses()
+        locationPermissions.launchPermissionRequest()
         update()
     }
 
