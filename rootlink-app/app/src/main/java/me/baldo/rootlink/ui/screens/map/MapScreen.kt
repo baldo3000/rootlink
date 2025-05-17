@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Looper
 import android.provider.Settings
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.GpsFixed
@@ -58,6 +55,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -231,8 +229,16 @@ private fun Map(
                             cameraPositionState.position.tilt,
                             0f
                         )
-                        if (currentIsFollowingUser) cameraPositionState.position = position
                         userPosition.position = position
+                        if (currentIsFollowingUser) {
+                            scope.launch {
+                                cameraPositionState.animate(
+                                    CameraUpdateFactory.newCameraPosition(
+                                        position
+                                    )
+                                )
+                            }
+                        }
                         return
                     }
                 }
@@ -273,11 +279,13 @@ private fun Map(
                 NotFollowingUserFAB {
                     scope.launch {
                         locationService.getCurrentLocation()?.let { newPosition ->
-                            cameraPositionState.position = CameraPosition(
-                                LatLng(newPosition.latitude, newPosition.longitude),
-                                cameraPositionState.position.zoom,
-                                cameraPositionState.position.tilt,
-                                0f
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newCameraPosition(
+                                    CameraPosition(
+                                        LatLng(newPosition.latitude, newPosition.longitude),
+                                        cameraPositionState.position.zoom, 0f, 0f
+                                    )
+                                )
                             )
                         }
                     }
@@ -393,47 +401,6 @@ private fun NotFollowingUserFAB(
             Icons.Outlined.GpsNotFixed,
             stringResource(R.string.map_follow_user)
         )
-    }
-}
-
-@Composable
-private fun TreeInfoWindow(tree: Tree) {
-    Column(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .sizeIn(minWidth = 128.dp, minHeight = 64.dp, maxWidth = 256.dp, maxHeight = 160.dp)
-            .padding(12.dp),
-    ) {
-        Text(
-            text = tree.species.uppercase(),
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = tree.location.replaceFirstChar { it.titlecase(Locale.getDefault()) },
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Spacer(Modifier.height(4.dp))
-        Button(
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-            ),
-            onClick = {}
-        ) {
-            Icon(
-                Icons.Outlined.OpenWith,
-                stringResource(R.string.map_tree_expand)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.map_tree_expand))
-        }
-
     }
 }
 
