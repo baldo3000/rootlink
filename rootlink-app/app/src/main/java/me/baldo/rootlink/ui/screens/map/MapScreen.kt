@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -326,13 +327,13 @@ private fun Map(
                     showTreeDialog = true
                     isFollowingUser
                 },
-                // clusterItemContent = { tree ->
-                //     Icon(
-                //         painter = painterResource(R.drawable.tree),
-                //         contentDescription = tree.species,
-                //         tint = Color.Unspecified
-                //     )
-                // }
+                clusterItemContent = { tree ->
+                    Icon(
+                        painter = painterResource(R.drawable.tree),
+                        contentDescription = tree.species,
+                        tint = Color.Unspecified
+                    )
+                }
             )
         }
 
@@ -343,7 +344,7 @@ private fun Map(
             markAsLoaded()
         }
         // Show a dialog or bottom sheet when a tree is selected
-        selectedTree?.let { tree ->
+        selectedTree.let { tree ->
             if (showTreeDialog) {
                 TreeInfoDialog(
                     tree = tree,

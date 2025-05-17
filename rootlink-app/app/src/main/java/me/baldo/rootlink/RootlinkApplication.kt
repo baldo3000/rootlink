@@ -29,7 +29,26 @@ class RootlinkApplication : Application() {
 
         val rawResources = listOf(
             R.raw.trees_emilia_romagna,
-            // R.raw.trees_sardegna
+            R.raw.trees_sardegna,
+            R.raw.trees_abruzzo,
+            R.raw.trees_bolzano,
+            R.raw.trees_campania,
+            R.raw.trees_friuli_venezia_giulia,
+            R.raw.trees_liguria,
+            R.raw.trees_marche,
+            R.raw.trees_piemonte,
+            R.raw.trees_toscana,
+            R.raw.trees_umbria,
+            R.raw.trees_veneto,
+            R.raw.trees_basilicata,
+            R.raw.trees_calabria,
+            R.raw.trees_lazio,
+            R.raw.trees_lombardia,
+            R.raw.trees_molise,
+            R.raw.trees_puglia,
+            R.raw.trees_sicilia,
+            R.raw.trees_trento,
+            R.raw.trees_valle_daosta
         )
         val json = Json { ignoreUnknownKeys = true }
 
