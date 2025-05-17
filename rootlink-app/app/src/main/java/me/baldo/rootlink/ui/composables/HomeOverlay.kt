@@ -1,5 +1,6 @@
 package me.baldo.rootlink.ui.composables
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,9 +30,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
@@ -45,6 +48,7 @@ fun HomeOverlay(
     navController: NavHostController,
     content: @Composable (PaddingValues) -> Unit
 ) {
+    val ctx = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -122,7 +126,14 @@ fun HomeOverlay(
                                 contentDescription = stringResource(R.string.menu_item_source)
                             )
                         },
-                        onClick = { /* TODO: handle click */ }
+                        onClick = {
+                            ctx.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://www.masaf.gov.it/flex/cm/pages/ServeBLOB.php/L/IT/IDPagina/11260".toUri()
+                                )
+                            )
+                        }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
