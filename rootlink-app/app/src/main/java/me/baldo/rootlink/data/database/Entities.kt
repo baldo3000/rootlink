@@ -41,12 +41,13 @@ data class Tree(
     val species: String = "",
     @SerialName("circumference")
     val circumference: Double = NaN,
+    val age: Int = (circumference / 2.5).toInt(),
     @SerialName("height")
     val height: Double = NaN,
     @SerialName("monumentalityCriteria")
     val monumentalityCriteria: String = "",
     @SerialName("significantPublicInterest")
-    val significantPublicInterest: Boolean = false,
+    val significantPublicInterest: Boolean = false
 ) : ClusterItem {
     override fun equals(other: Any?): Boolean {
         return if (other is Tree) {
@@ -62,6 +63,7 @@ data class Tree(
         return """
             Sei un albero della specie $species ($speciesScientificName), situato a $location, $municipality, $province, $region, Italia (latitudine: $latitude, longitudine: $longitude, altitudine: $altitude m).
             La tua circonferenza è di $circumference cm e la tua altezza è di $height m.
+            La tua età stimata è di circa $age anni.
             Sei un albero monumentale, con i seguenti criteri di monumentalità: $monumentalityCriteria.
             Sei di interesse pubblico significativo: $significantPublicInterest.
             Sei inserito in un contesto urbano: $urban.

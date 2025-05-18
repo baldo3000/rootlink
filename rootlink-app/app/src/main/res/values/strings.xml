@@ -74,8 +74,8 @@
     <string name="tree_info_value_species">Common Name</string>
     <string name="tree_info_value_species_scientific">Scientific Name</string>
     <string name="tree_info_value_circumference">Circumference (cm)</string>
+    <string name="tree_info_value_age">Estimated Age (~y)</string>
     <string name="tree_info_value_height">Height (m)</string>
-    <string name="tree_info_value_age">Age</string>
     <string name="tree_info_value_monumentality_criteria">Monumentality Criteria</string>
     <string name="tree_info_value_public_interest">Significant Public Interest</string>
 
@@ -85,5 +85,9 @@
     <string name="settings_map_show_all_trees_details">Show trees without significant public interest\nNote: this may cause lag</string>
     <string name="settings_map_show_all_trees_on">Show all trees</string>
     <string name="settings_map_show_all_trees_off">Hide trees without significant public interest</string>
+
+    <!-- Chat -->
+    <string name="chat_text_field_placeholder">Ask something to the tree…</string>
+    <string name="chat_send_button">Send</string>
 
 </resources>

@@ -58,14 +58,14 @@ fun ChatScreen(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
             TopBar(
-                title = stringResource(R.string.screen_chat),
+                title = "${stringResource(R.string.screen_chat)} (${chatState.tree?.species})",
                 onBackPressed = navController::navigateUp
             )
         },
         bottomBar = {
             OutlinedTextField(
                 value = chatState.fieldText,
-                placeholder = { Text("Make a question...") },
+                placeholder = { Text(stringResource(R.string.chat_text_field_placeholder)) },
                 onValueChange = { chatActions.updateFieldText(it) },
                 singleLine = true,
                 modifier = Modifier
@@ -77,7 +77,10 @@ fun ChatScreen(
                         val message = chatState.fieldText
                         if (message.isNotEmpty()) chatActions.sendMessage()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, "Send")
+                        Icon(
+                            Icons.AutoMirrored.Filled.Send,
+                            stringResource(R.string.chat_send_button)
+                        )
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(

@@ -127,6 +127,10 @@ fun TreeInfoScreen(
                         label = stringResource(R.string.tree_info_value_height),
                         value = treeInfoState.tree.height.toString()
                     )
+                    InfoRow(
+                        label = stringResource(R.string.tree_info_value_age),
+                        value = treeInfoState.tree.age.toString()
+                    )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
 
