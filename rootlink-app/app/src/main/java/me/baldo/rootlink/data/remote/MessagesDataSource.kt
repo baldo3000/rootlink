@@ -53,8 +53,8 @@ class MessagesDataSource(
 
     @OptIn(ExperimentalTime::class)
     suspend fun sendMessage(messages: List<ChatMessage>): ChatMessage {
-        // val url = "$BASE_URL/api/chat"
-        val url = "https://192.168.1.180:3000/api/chat"
+        val url = "$BASE_URL/api/chat"
+        // val url = "https://192.168.1.180:3000/api/chat"
         val answer = try {
             httpClient.post(url) {
                 contentType(ContentType.Application.Json)
