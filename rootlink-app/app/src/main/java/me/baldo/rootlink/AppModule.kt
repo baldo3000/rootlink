@@ -34,7 +34,7 @@ val appModule = module {
     single { MessagesDataSource(get()) }
     single { AirQualityDataSource(get()) }
 
-    viewModel { ChatViewModel(get(), get()) }
+    viewModel { ChatViewModel(get(), get(), get()) }
     viewModel { MapViewModel(get()) }
     viewModel { TreeInfoViewModel(get()) }
     viewModel { SettingsViewModel(get()) }

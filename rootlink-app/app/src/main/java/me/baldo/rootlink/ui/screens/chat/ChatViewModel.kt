@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.data.database.Tree
+import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
 import me.baldo.rootlink.data.repositories.TreesRepository
 import java.util.Date
@@ -26,7 +27,8 @@ interface ChatActions {
 
 class ChatViewModel(
     private val treesRepository: TreesRepository,
-    private val messagesDataSource: MessagesDataSource
+    private val messagesDataSource: MessagesDataSource,
+    private val airQualityDataSource: AirQualityDataSource
 ) : ViewModel() {
     private val _state = MutableStateFlow<ChatState>(ChatState())
     val state = _state.asStateFlow()
@@ -35,48 +37,53 @@ class ChatViewModel(
             viewModelScope.launch {
                 val tree = treesRepository.getTree(cardId)
                 val treeWithChatMessages = treesRepository.getChatMessagesForTree(cardId)
-                val messages = treeWithChatMessages.chatMessages.let {
-                    if (it.isEmpty()) {
-                        listOf(
-                            ChatMessage(
-                                treeId = cardId,
-                                role = "system",
-                                content = tree?.generateAIPrompt() ?: error("Trying to speak to a tree which does not exist"),
-                                createdAt = Date()
-                            )
-                        )
-                    } else {
-                        it
-                    }
-                }
                 _state.update {
                     it.copy(
                         tree = tree,
-                        chatMessages = messages
+                        chatMessages = treeWithChatMessages.chatMessages
                     )
                 }
             }
         }
 
         override fun sendMessage() {
-            val message = ChatMessage(
-                treeId = state.value.tree?.cardId ?: error("No tree selected"),
-                role = "user",
-                content = state.value.fieldText,
-                createdAt = Date()
-            )
-            // Update local copy
-            _state.update { it.copy(chatMessages = it.chatMessages + message, fieldText = "") }
-            // Update database
-            viewModelScope.launch {
-                treesRepository.insertChatMessage(message)
-            }
-            // Send message to the server and wait for response
-            viewModelScope.launch {
-                val responseMessage = messagesDataSource.sendMessage(_state.value.chatMessages)
-                _state.update { it.copy(chatMessages = it.chatMessages + responseMessage) }
-                treesRepository.insertChatMessage(responseMessage)
-            }
+            state.value.tree?.let { tree ->
+                val userMessage = ChatMessage(
+                    treeId = tree.cardId,
+                    role = "user",
+                    content = state.value.fieldText,
+                    createdAt = Date()
+                )
+                // Update local copy
+                _state.update {
+                    it.copy(
+                        chatMessages = it.chatMessages + userMessage,
+                        fieldText = ""
+                    )
+                }
+                // Update database
+                viewModelScope.launch {
+                    treesRepository.insertChatMessage(userMessage)
+                }
+                // Send message to the server and wait for response
+                viewModelScope.launch {
+                    val pos = tree.position
+                    val sendMessages = state.value.chatMessages.toMutableList().apply {
+                        val airQuality =
+                            airQualityDataSource.getAirQuality(pos.latitude, pos.longitude)
+                        val airQualityMessage = ChatMessage(
+                            treeId = get(0).treeId,
+                            role = "system",
+                            content = tree.generateAIPrompt() + "\nAir quality index: $airQuality",
+                            createdAt = Date()
+                        )
+                        add(0, airQualityMessage)
+                    }
+                    val responseMessage = messagesDataSource.sendMessage(sendMessages)
+                    _state.update { it.copy(chatMessages = it.chatMessages + responseMessage) }
+                    treesRepository.insertChatMessage(responseMessage)
+                }
+            } ?: run { error("No tree selected") }
         }
 
         override fun updateFieldText(text: String) {
