@@ -82,7 +82,7 @@ private fun SwitchRowWithDescription(
                 onClick = { onCheckedChange(!checked) })
             .padding(28.dp)
     ) {
-        Column() {
+        Column {
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleLarge,

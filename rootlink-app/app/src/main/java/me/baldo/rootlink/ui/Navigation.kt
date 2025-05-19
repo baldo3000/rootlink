@@ -46,7 +46,6 @@ sealed interface RootlinkRoute {
 
 @Composable
 fun RootlinkNavGraph(navController: NavHostController) {
-    val ctx = LocalContext.current
     val mapVM: MapViewModel = koinViewModel()
     val mapState by mapVM.state.collectAsStateWithLifecycle()
     val chatVM = koinViewModel<ChatViewModel>()
