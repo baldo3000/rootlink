@@ -13,7 +13,6 @@ import me.baldo.rootlink.data.repositories.TreesRepository
 data class MapState(
     val trees: List<Tree> = emptyList(),
     val isFollowingUser: Boolean = false,
-    val isLoaded: Boolean = false,
 
     val showLocationDisabledWarning: Boolean = false,
     val showLocationPermissionDeniedWarning: Boolean = false,
@@ -26,7 +25,6 @@ interface ChatActions {
     fun addTrees(trees: List<Tree>)
     fun updateTrees(trees: List<Tree>)
     fun setFollowingUser(follow: Boolean)
-    fun markAsLoaded()
 
     fun setShowLocationDisabledWarning(show: Boolean)
     fun setShowLocationPermissionDeniedWarning(show: Boolean)
@@ -65,10 +63,6 @@ class MapViewModel(
 
         override fun setFollowingUser(follow: Boolean) {
             _state.update { it.copy(isFollowingUser = follow) }
-        }
-
-        override fun markAsLoaded() {
-            _state.update { it.copy(isLoaded = true) }
         }
 
         override fun setShowLocationDisabledWarning(show: Boolean) {

@@ -186,8 +186,6 @@ fun MapScreen(
                     trees = mapState.trees.filter { it.significantPublicInterest || showAllTrees },
                     isFollowingUser = mapState.isFollowingUser,
                     setFollowUser = mapActions::setFollowingUser,
-                    isLoaded = mapState.isLoaded,
-                    markAsLoaded = mapActions::markAsLoaded,
                     onTreeInfoClick = {
                         navController.navigate(RootlinkRoute.TreeInfo(it.cardId))
                     },
@@ -207,8 +205,6 @@ private fun Map(
     trees: List<Tree>,
     isFollowingUser: Boolean,
     setFollowUser: (Boolean) -> Unit,
-    isLoaded: Boolean,
-    markAsLoaded: () -> Unit,
     onTreeInfoClick: (Tree) -> Unit,
     onTreeChatClick: (Tree) -> Unit,
     modifier: Modifier = Modifier
@@ -218,7 +214,9 @@ private fun Map(
     val scope = rememberCoroutineScope()
     var selectedTree by remember { mutableStateOf<Tree>(Tree()) }
     var showTreeDialog by remember { mutableStateOf(false) }
-    val cameraPositionState = rememberCameraPositionState()
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(42.7189196, 12.8998566), 6f)
+    }
     val userPosition = rememberCameraPositionState()
     val fusedLocationClient = remember { getFusedLocationProviderClient(ctx) }
     val currentIsFollowingUser by rememberUpdatedState(isFollowingUser)
@@ -374,12 +372,6 @@ private fun Map(
             )
         }
 
-        // The first time the map is loaded camera position is configured
-        if (!isLoaded) {
-            cameraPositionState.position =
-                CameraPosition(LatLng(42.7189196, 12.8998566), 6f, 0f, 0f)
-            markAsLoaded()
-        }
         // Show a dialog or bottom sheet when a tree is selected
         selectedTree.let { tree ->
             if (showTreeDialog) {
