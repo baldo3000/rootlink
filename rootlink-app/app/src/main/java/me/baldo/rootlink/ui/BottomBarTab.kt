@@ -1,6 +1,8 @@
 package me.baldo.rootlink.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
@@ -37,11 +39,19 @@ sealed interface BottomBarTab {
         override val screen = RootlinkRoute.Favourites
     }
 
+    data object Catalog : BottomBarTab {
+        override val icon = Icons.AutoMirrored.Outlined.ViewList
+        override val iconSelected = Icons.AutoMirrored.Filled.ViewList
+        override val titleResID = R.string.screen_catalog
+        override val screen = RootlinkRoute.Catalog
+    }
+
     companion object {
         val tabs = listOf(
             Home,
             Map,
-            Favourites
+            Favourites,
+            Catalog
         )
     }
 }

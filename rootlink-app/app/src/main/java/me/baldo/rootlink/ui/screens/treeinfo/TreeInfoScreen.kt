@@ -171,7 +171,6 @@ private fun SectionCard(
 ) {
     var expanded by remember { mutableStateOf(true) }
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -194,9 +193,9 @@ private fun SectionCard(
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Outlined.KeyboardArrowDown else Icons.Outlined.KeyboardArrowUp,
-                    contentDescription = if (expanded) stringResource(R.string.tree_info_action_collapse) else stringResource(
-                        R.string.tree_info_action_expand
-                    )
+                    contentDescription =
+                        if (expanded) stringResource(R.string.tree_info_action_collapse)
+                        else stringResource(R.string.tree_info_action_expand)
                 )
             }
 

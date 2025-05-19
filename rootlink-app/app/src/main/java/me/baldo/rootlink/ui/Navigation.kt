@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import me.baldo.rootlink.ui.screens.catalog.CatalogScreen
+import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapScreen
@@ -37,6 +39,9 @@ sealed interface RootlinkRoute {
 
     @Serializable
     data object Settings : RootlinkRoute
+
+    @Serializable
+    data object Catalog : RootlinkRoute
 }
 
 @Composable
@@ -96,6 +101,16 @@ fun RootlinkNavGraph(navController: NavHostController) {
             SettingsScreen(
                 settingsState = settingsState,
                 settingsActions = settingsVM.actions,
+                navController = navController
+            )
+        }
+
+        composable<RootlinkRoute.Catalog> {
+            val catalogVM = koinViewModel<CatalogViewModel>()
+            val catalogState by catalogVM.state.collectAsStateWithLifecycle()
+            CatalogScreen(
+                catalogState = catalogState,
+                catalogActions = catalogVM.actions,
                 navController = navController
             )
         }
