@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +62,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.clustering.ClusterItem
+import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.ComposeMapColorScheme
 import com.google.maps.android.compose.GoogleMap
@@ -69,6 +71,8 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
+import com.google.maps.android.compose.clustering.rememberClusterManager
+import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.R
@@ -318,6 +322,48 @@ private fun Map(
             ),
             mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM
         ) {
+            val windowInfo = LocalWindowInfo.current
+            val screenHeight = windowInfo.containerSize.height
+            val screenWidth = windowInfo.containerSize.width
+            val clusterManager = rememberClusterManager<Tree>()
+
+            clusterManager?.setAlgorithm(
+                NonHierarchicalViewBasedAlgorithm(screenWidth, screenHeight)
+            )
+
+            val renderer = rememberClusterRenderer(
+                clusterContent = null,
+                clusterItemContent = { tree ->
+                    Icon(
+                        painter = painterResource(R.drawable.tree),
+                        contentDescription = tree.species,
+                        tint = Color.Unspecified
+                    )
+                },
+                clusterManager = clusterManager,
+            )
+
+            SideEffect {
+                clusterManager ?: return@SideEffect
+                clusterManager.setOnClusterItemClickListener { tree ->
+                    selectedTree = tree
+                    showTreeDialog = true
+                    isFollowingUser
+                }
+            }
+            SideEffect {
+                if (clusterManager?.renderer != renderer) {
+                    clusterManager?.renderer = renderer ?: return@SideEffect
+                }
+            }
+
+            if (clusterManager != null) {
+                Clustering(
+                    items = trees,
+                    clusterManager = clusterManager,
+                )
+            }
+
             // Draw a black circle around the user's location
             Circle(
                 center = userPosition.position.target,
@@ -325,23 +371,6 @@ private fun Map(
                 fillColor = Color.Black.copy(alpha = 0.1f),
                 strokeColor = Color.Black,
                 strokeWidth = 3f
-            )
-
-            // Draw trees in clusters
-            Clustering(
-                items = trees,
-                onClusterItemClick = { tree ->
-                    selectedTree = tree
-                    showTreeDialog = true
-                    isFollowingUser
-                },
-                clusterItemContent = { tree ->
-                    Icon(
-                        painter = painterResource(R.drawable.tree),
-                        contentDescription = tree.species,
-                        tint = Color.Unspecified
-                    )
-                }
             )
         }
 
@@ -496,23 +525,4 @@ private fun Warning(
             Text(buttonText)
         }
     }
-}
-
-data class MyItem(
-    val itemPosition: LatLng,
-    val itemTitle: String,
-    val itemSnippet: String,
-    val itemZIndex: Float,
-) : ClusterItem {
-    override fun getPosition(): LatLng =
-        itemPosition
-
-    override fun getTitle(): String =
-        itemTitle
-
-    override fun getSnippet(): String =
-        itemSnippet
-
-    override fun getZIndex(): Float =
-        itemZIndex
 }
