@@ -1,10 +1,11 @@
 package me.baldo.rootlink.ui.screens.map
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.Tree
@@ -21,9 +22,6 @@ data class MapState(
 )
 
 interface ChatActions {
-    fun addTree(tree: Tree)
-    fun addTrees(trees: List<Tree>)
-    fun updateTrees(trees: List<Tree>)
     fun setFollowingUser(follow: Boolean)
 
     fun setShowLocationDisabledWarning(show: Boolean)
@@ -34,32 +32,26 @@ interface ChatActions {
 }
 
 class MapViewModel(
-    private val treesRepository: TreesRepository
+    treesRepository: TreesRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state = _state.asStateFlow()
 
+    val trees = treesRepository.getAllTrees().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyList()
+    )
+
     init {
         viewModelScope.launch {
-            val trees = treesRepository.getTrees()
-            Log.i("MapViewModel", "Loaded ${trees.size} trees")
-            _state.update { it.copy(trees = trees) }
+            trees.collect { trees ->
+                _state.update { it.copy(trees = trees) }
+            }
         }
     }
 
     val actions = object : ChatActions {
-
-        override fun addTree(tree: Tree) {
-            _state.update { it.copy(trees = it.trees + tree) }
-        }
-
-        override fun addTrees(trees: List<Tree>) {
-            _state.update { it.copy(trees = it.trees + trees) }
-        }
-
-        override fun updateTrees(trees: List<Tree>) {
-            _state.update { it.copy(trees = trees) }
-        }
 
         override fun setFollowingUser(follow: Boolean) {
             _state.update { it.copy(isFollowingUser = follow) }

@@ -11,7 +11,7 @@ class TreesRepository(
 
     suspend fun upsertTree(tree: Tree) = treesDAO.upsertTree(tree)
 
-    suspend fun getTrees() = treesDAO.getTrees()
+    fun getAllTrees() = treesDAO.getAllTrees()
 
     suspend fun getTree(treeId: String) = treesDAO.getTree(treeId)
 

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TreesDAO {
@@ -16,7 +17,7 @@ interface TreesDAO {
     suspend fun upsertTree(tree: Tree)
 
     @Query("SELECT * FROM Tree")
-    suspend fun getTrees(): List<Tree>
+    fun getAllTrees(): Flow<List<Tree>>
 
     @Query("SELECT * FROM Tree WHERE cardId = :cardId")
     suspend fun getTree(cardId: String): Tree?
