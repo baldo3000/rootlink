@@ -115,7 +115,10 @@ fun HomeOverlay(
                                 contentDescription = stringResource(R.string.menu_item_catalog)
                             )
                         },
-                        onClick = { /* TODO: handle click */ }
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(RootlinkRoute.Catalog)
+                        }
                     )
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.menu_item_source)) },
