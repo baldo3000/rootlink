@@ -22,6 +22,9 @@ interface TreesDAO {
     @Query("SELECT * FROM Tree")
     fun getAllTrees(): Flow<List<Tree>>
 
+    @Query("SELECT * FROM Tree")
+    suspend fun getAllTreesOneShot(): List<Tree>
+
     @Query("SELECT * FROM Tree WHERE cardId = :cardId")
     suspend fun getTree(cardId: String): Tree?
 

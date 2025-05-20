@@ -25,6 +25,8 @@ class TreesRepository(
 
     fun getAllTrees() = treesDAO.getAllTrees()
 
+    suspend fun getAllTreesOneShot() = treesDAO.getAllTreesOneShot()
+
     suspend fun getTree(treeId: String) = treesDAO.getTree(treeId)
 
     suspend fun insertChatMessage(chatMessage: ChatMessage) {

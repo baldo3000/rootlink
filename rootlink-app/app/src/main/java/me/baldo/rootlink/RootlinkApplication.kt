@@ -1,6 +1,7 @@
 package me.baldo.rootlink
 
 import android.app.Application
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -35,8 +36,10 @@ class RootlinkApplication : Application() {
 
     private fun loadTrees() {
         applicationScope.launch {
-            val trees = treesDataSource.getTrees()
-            treesRepository.loadNewTrees(trees)
+            val treesLocal = treesRepository.getAllTreesOneShot()
+            treesRepository.loadNewTrees(treesLocal)
+            val treesUpdated = treesDataSource.getTrees()
+            treesRepository.loadNewTrees(treesUpdated)
         }
     }
 }
