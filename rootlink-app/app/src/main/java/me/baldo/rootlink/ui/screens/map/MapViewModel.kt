@@ -37,11 +37,7 @@ class MapViewModel(
     private val _state = MutableStateFlow(MapState())
     val state = _state.asStateFlow()
 
-    val trees = treesRepository.getAllTrees().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList()
-    )
+    val trees = treesRepository.loadedTrees
 
     init {
         viewModelScope.launch {

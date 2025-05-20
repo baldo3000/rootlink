@@ -10,7 +10,6 @@ import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.baldo.rootlink.BuildConfig
-import kotlin.time.ExperimentalTime
 
 // Request object schema
 // {
@@ -124,7 +123,6 @@ class AirQualityDataSource(
             "https://airquality.googleapis.com/v1/currentConditions:lookup"
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun getAirQuality(latitude: Double, longitude: Double): AirQualityIndex? {
         Log.i(TAG, "Getting air quality for $latitude, $longitude")
         val request = AirQualityRequestMessage(

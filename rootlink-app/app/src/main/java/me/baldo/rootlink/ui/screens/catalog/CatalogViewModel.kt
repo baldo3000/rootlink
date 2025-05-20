@@ -23,11 +23,7 @@ class CatalogViewModel(
     private val _state = MutableStateFlow(CatalogState())
     val state = _state.asStateFlow()
 
-    val trees = treesRepository.getAllTrees().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList()
-    )
+    val trees = treesRepository.loadedTrees
 
     init {
         viewModelScope.launch {

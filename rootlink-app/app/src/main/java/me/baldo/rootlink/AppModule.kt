@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import me.baldo.rootlink.data.database.RootlinkLocalDatabase
 import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.data.remote.TreesDataSource
 import me.baldo.rootlink.data.repositories.SettingsRepository
 import me.baldo.rootlink.data.repositories.TreesRepository
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
@@ -34,6 +35,7 @@ val appModule = module {
 
     single { MessagesDataSource(get()) }
     single { AirQualityDataSource(get()) }
+    single { TreesDataSource(get()) }
 
     viewModel { ChatViewModel(get(), get(), get()) }
     viewModel { MapViewModel(get()) }

@@ -16,6 +16,9 @@ interface TreesDAO {
     @Upsert
     suspend fun upsertTree(tree: Tree)
 
+    @Upsert
+    suspend fun upsertTrees(trees: List<Tree>)
+
     @Query("SELECT * FROM Tree")
     fun getAllTrees(): Flow<List<Tree>>
 

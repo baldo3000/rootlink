@@ -10,6 +10,7 @@ import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
+import me.baldo.rootlink.data.remote.TreesDataSource
 import me.baldo.rootlink.data.repositories.TreesRepository
 import java.util.Date
 
@@ -69,15 +70,15 @@ class ChatViewModel(
                 viewModelScope.launch {
                     val pos = tree.position
                     val sendMessages = state.value.chatMessages.toMutableList().apply {
-                        val airQuality =
-                            airQualityDataSource.getAirQuality(pos.latitude, pos.longitude)
-                        val airQualityMessage = ChatMessage(
-                            treeId = get(0).treeId,
-                            role = "system",
-                            content = tree.generateAIPrompt() + "\nAir quality index: $airQuality",
-                            createdAt = Date()
-                        )
-                        add(0, airQualityMessage)
+                        airQualityDataSource.getAirQuality(pos.latitude, pos.longitude)?.let {
+                            val airQualityMessage = ChatMessage(
+                                treeId = get(0).treeId,
+                                role = "system",
+                                content = tree.generateAIPrompt() + "\nAir quality index: $it",
+                                createdAt = Date()
+                            )
+                            add(0, airQualityMessage)
+                        }
                     }
                     val responseMessage = messagesDataSource.sendMessage(sendMessages)
                     _state.update { it.copy(chatMessages = it.chatMessages + responseMessage) }
