@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapScreen
 import me.baldo.rootlink.ui.screens.catalog.CatalogScreen
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatScreen
@@ -28,6 +29,9 @@ sealed interface RootlinkRoute {
 
     @Serializable
     data object Map : RootlinkRoute
+
+    @Serializable
+    data object AirQualityMap : RootlinkRoute
 
     @Serializable
     data object Favourites : RootlinkRoute
@@ -77,6 +81,10 @@ fun RootlinkNavGraph(navController: NavHostController) {
                 openTreeChat = chatVM.actions::openTreeChat,
                 navController = navController
             )
+        }
+
+        composable<RootlinkRoute.AirQualityMap> {
+            AirQualityMapScreen(navController)
         }
 
         composable<RootlinkRoute.Favourites> {

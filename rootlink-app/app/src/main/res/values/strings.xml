@@ -4,8 +4,9 @@
 
     <!-- Screens -->
     <string name="screen_map">Map</string>
+    <string name="screen_air_quality_map">Air Quality</string>
     <string name="screen_chat">Chat</string>
-    <string name="screen_tree_info">Tree info</string>
+    <string name="screen_tree_info">Tree Info</string>
     <string name="screen_settings">Settings</string>
     <string name="screen_profile">Profile</string>
     <string name="screen_home">Home</string>

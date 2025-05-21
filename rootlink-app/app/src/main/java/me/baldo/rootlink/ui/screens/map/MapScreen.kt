@@ -307,7 +307,7 @@ private fun Map(
                     LatLng(47.224792, 18.774244)
                 ),
                 mapType = MapType.NORMAL,
-                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style),
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style_map),
                 minZoomPreference = 6f
             ),
             uiSettings = MapUiSettings(

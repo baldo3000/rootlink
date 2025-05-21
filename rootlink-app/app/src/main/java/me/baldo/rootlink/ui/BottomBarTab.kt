@@ -3,9 +3,11 @@ package me.baldo.rootlink.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.automirrored.outlined.ViewList
+import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Map
@@ -32,6 +34,13 @@ sealed interface BottomBarTab {
         override val screen = RootlinkRoute.Map
     }
 
+    data object AirQualityMap : BottomBarTab {
+        override val icon = Icons.Outlined.Air
+        override val iconSelected = Icons.Filled.Air
+        override val titleResID = R.string.screen_air_quality_map
+        override val screen = RootlinkRoute.AirQualityMap
+    }
+
     data object Favourites : BottomBarTab {
         override val icon = Icons.Outlined.FavoriteBorder
         override val iconSelected = Icons.Filled.Favorite
@@ -50,6 +59,7 @@ sealed interface BottomBarTab {
         val tabs = listOf(
             Home,
             Map,
+            AirQualityMap,
             Favourites,
             Catalog
         )
