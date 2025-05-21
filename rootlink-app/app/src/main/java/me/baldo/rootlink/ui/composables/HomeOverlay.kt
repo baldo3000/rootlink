@@ -12,9 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
-import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.ViewList
+import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
@@ -83,20 +83,23 @@ fun HomeOverlay(
                     Spacer(Modifier.height(12.dp))
 
                     Text(
-                        text = stringResource(R.string.menu_account),
+                        text = stringResource(R.string.menu_profile),
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.titleMedium
                     )
                     NavigationDrawerItem(
-                        label = { Text(stringResource(R.string.menu_item_login)) },
+                        label = { Text(stringResource(R.string.menu_item_edit_profile)) },
                         selected = false,
                         icon = {
                             Icon(
-                                Icons.AutoMirrored.Outlined.Login,
-                                contentDescription = stringResource(R.string.menu_item_login)
+                                Icons.Outlined.ManageAccounts,
+                                contentDescription = stringResource(R.string.menu_item_edit_profile)
                             )
                         },
-                        onClick = { /* TODO: handle click */ }
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(RootlinkRoute.Profile)
+                        }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

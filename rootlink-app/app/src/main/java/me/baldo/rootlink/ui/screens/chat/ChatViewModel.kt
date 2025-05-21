@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.data.database.Tree
 import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
-import me.baldo.rootlink.data.remote.TreesDataSource
+import me.baldo.rootlink.data.repositories.ProfileRepository
 import me.baldo.rootlink.data.repositories.TreesRepository
 import java.util.Date
 
@@ -28,6 +29,7 @@ interface ChatActions {
 
 class ChatViewModel(
     private val treesRepository: TreesRepository,
+    private val profileRepository: ProfileRepository,
     private val messagesDataSource: MessagesDataSource,
     private val airQualityDataSource: AirQualityDataSource
 ) : ViewModel() {
@@ -74,7 +76,7 @@ class ChatViewModel(
                             val airQualityMessage = ChatMessage(
                                 treeId = get(0).treeId,
                                 role = "system",
-                                content = tree.generateAIPrompt() + "\nAir quality index: $it",
+                                content = tree.generateAIPrompt() + "\nAir quality index: $it" + "\nName of the user: ${profileRepository.name.first()}",
                                 createdAt = Date()
                             )
                             add(0, airQualityMessage)

@@ -13,11 +13,13 @@ import me.baldo.rootlink.data.database.RootlinkLocalDatabase
 import me.baldo.rootlink.data.remote.AirQualityDataSource
 import me.baldo.rootlink.data.remote.MessagesDataSource
 import me.baldo.rootlink.data.remote.TreesDataSource
+import me.baldo.rootlink.data.repositories.ProfileRepository
 import me.baldo.rootlink.data.repositories.SettingsRepository
 import me.baldo.rootlink.data.repositories.TreesRepository
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapViewModel
+import me.baldo.rootlink.ui.screens.profile.ProfileViewModel
 import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.core.module.dsl.viewModel
@@ -37,11 +39,12 @@ val appModule = module {
     single { AirQualityDataSource(get()) }
     single { TreesDataSource(get()) }
 
-    viewModel { ChatViewModel(get(), get(), get()) }
+    viewModel { ChatViewModel(get(), get(), get(), get()) }
     viewModel { MapViewModel(get()) }
     viewModel { TreeInfoViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { CatalogViewModel(get()) }
+    viewModel { ProfileViewModel(get()) }
 
     single {
         Room.databaseBuilder(
@@ -56,6 +59,7 @@ val appModule = module {
 
     single { TreesRepository(get<RootlinkLocalDatabase>().treesDAO()) }
     single { SettingsRepository(get()) }
+    single { ProfileRepository(get()) }
 
     single {
         HttpClient(OkHttp) {

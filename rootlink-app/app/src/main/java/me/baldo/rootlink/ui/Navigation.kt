@@ -2,7 +2,6 @@ package me.baldo.rootlink.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,6 +14,8 @@ import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapScreen
 import me.baldo.rootlink.ui.screens.map.MapViewModel
+import me.baldo.rootlink.ui.screens.profile.ProfileScreen
+import me.baldo.rootlink.ui.screens.profile.ProfileViewModel
 import me.baldo.rootlink.ui.screens.settings.SettingsScreen
 import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoScreen
@@ -41,6 +42,9 @@ sealed interface RootlinkRoute {
     data object Settings : RootlinkRoute
 
     @Serializable
+    data object Profile : RootlinkRoute
+
+    @Serializable
     data object Catalog : RootlinkRoute
 }
 
@@ -54,6 +58,8 @@ fun RootlinkNavGraph(navController: NavHostController) {
     val treeInfoState by treeInfoVM.state.collectAsStateWithLifecycle()
     val settingsVM = koinViewModel<SettingsViewModel>()
     val settingsState by settingsVM.state.collectAsStateWithLifecycle()
+    val profileVM = koinViewModel<ProfileViewModel>()
+    val profileState by profileVM.state.collectAsStateWithLifecycle()
 
     NavHost(
         navController = navController,
@@ -100,6 +106,14 @@ fun RootlinkNavGraph(navController: NavHostController) {
             SettingsScreen(
                 settingsState = settingsState,
                 settingsActions = settingsVM.actions,
+                navController = navController
+            )
+        }
+
+        composable<RootlinkRoute.Profile> {
+            ProfileScreen(
+                profileState = profileState,
+                profileActions = profileVM.actions,
                 navController = navController
             )
         }

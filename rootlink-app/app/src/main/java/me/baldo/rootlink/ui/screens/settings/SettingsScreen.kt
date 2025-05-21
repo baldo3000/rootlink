@@ -26,7 +26,7 @@ import me.baldo.rootlink.ui.composables.TopBar
 fun SettingsScreen(
     settingsState: SettingsState,
     settingsActions: SettingsActions,
-    navController: NavHostController,
+    navController: NavHostController
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,

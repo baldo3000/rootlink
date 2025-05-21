@@ -89,7 +89,7 @@ fun ChatScreen(
                 ),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
-                    autoCorrect = true
+                    autoCorrectEnabled = true
                 )
             )
         }
