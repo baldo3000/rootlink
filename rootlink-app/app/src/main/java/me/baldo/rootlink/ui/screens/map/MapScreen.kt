@@ -285,7 +285,7 @@ private fun Map(
                                 CameraUpdateFactory.newCameraPosition(
                                     CameraPosition(
                                         LatLng(newPosition.latitude, newPosition.longitude),
-                                        cameraPositionState.position.zoom, 0f, 0f
+                                        maxOf(cameraPositionState.position.zoom, 9f), 0f, 0f
                                     )
                                 )
                             )
