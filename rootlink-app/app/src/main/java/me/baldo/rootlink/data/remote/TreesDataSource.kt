@@ -15,7 +15,7 @@ class TreesDataSource(
         private const val BASE_URL = BuildConfig.SERVER_ADDRESS
     }
 
-    suspend fun getTrees(): List<Tree> {
+    suspend fun getTrees(): List<Tree>? {
         Log.i(TAG, "Getting trees from remote")
         val url = "$BASE_URL/api/trees"
         val trees = try {
@@ -23,9 +23,9 @@ class TreesDataSource(
             httpClient.get(url).body<List<Tree>>()
         } catch (e: Exception) {
             Log.e(TAG, "Error while requesting trees: ${e.message}")
-            emptyList<Tree>()
+            null
         }
-        Log.d(TAG, "Trees received: ${trees.size}")
+        Log.d(TAG, "Trees received: ${trees?.size}")
         return trees
     }
 }
