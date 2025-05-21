@@ -8,24 +8,32 @@
     ]
   },
   {
-    "featureType": "poi",
+    "featureType": "administrative.country",
+    "elementType": "geometry",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
+      },
+      {
+        "weight": 1.5
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.province",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "on"
+      },
+      {
+        "weight": 1.5
       }
     ]
   },
   {
     "featureType": "road",
     "elementType": "labels",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
     "stylers": [
       {
         "visibility": "off"
