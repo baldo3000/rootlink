@@ -1,7 +1,9 @@
 import { google } from '@ai-sdk/google';
 import { generateText, streamText, appendResponseMessages, Message, InvalidPromptError } from 'ai';
 
-const model = google('gemini-2.0-flash');
+const model = google('gemini-2.0-flash', {
+    useSearchGrounding: true,
+});
 
 export async function POST(req: Request) {
     try {
