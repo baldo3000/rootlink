@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -40,18 +43,22 @@ import me.baldo.rootlink.BuildConfig
 import me.baldo.rootlink.R
 import me.baldo.rootlink.ui.BottomBarTab
 import me.baldo.rootlink.ui.composables.HomeOverlay
+import me.baldo.rootlink.utils.isOnline
+import me.baldo.rootlink.utils.openWirelessSettings
 import java.net.MalformedURLException
 import java.net.URL
 
 @Composable
 fun AirQualityMapScreen(
+    airQualityMapState: AirQualityMapState,
+    airQualityMapActions: AirQualityMapActions,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
 
     fun update() {
-        // mapActions.setShowNoInternetConnectivityWarning(!isOnline(ctx))
+        airQualityMapActions.setShowNoInternetConnectivityWarning(!isOnline(ctx))
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
@@ -68,14 +75,14 @@ fun AirQualityMapScreen(
         navController = navController
     ) { innerPadding ->
         when {
-            // mapState.showNoInternetConnectivityWarning ->
-            //     Warning(
-            //         icon = Icons.Outlined.CloudOff,
-            //         title = stringResource(R.string.map_internet_disabled),
-            //         description = stringResource(R.string.map_internet_disabled_explanation),
-            //         buttonText = stringResource(R.string.map_internet_disabled_button),
-            //         modifier = modifier.padding(innerPadding)
-            //     ) { openWirelessSettings(ctx) }
+            airQualityMapState.showNoInternetConnectivityWarning ->
+                Warning(
+                    icon = Icons.Outlined.CloudOff,
+                    title = stringResource(R.string.map_internet_disabled),
+                    description = stringResource(R.string.map_internet_disabled_explanation),
+                    buttonText = stringResource(R.string.map_internet_disabled_button),
+                    modifier = modifier.padding(innerPadding)
+                ) { openWirelessSettings(ctx) }
 
             else ->
                 Map(

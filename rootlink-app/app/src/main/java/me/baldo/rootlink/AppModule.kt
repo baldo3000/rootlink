@@ -17,6 +17,7 @@ import me.baldo.rootlink.data.repositories.ProfileRepository
 import me.baldo.rootlink.data.repositories.SettingsRepository
 import me.baldo.rootlink.data.repositories.StatsRepository
 import me.baldo.rootlink.data.repositories.TreesRepository
+import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapViewModel
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapViewModel
@@ -48,6 +49,7 @@ val appModule = module {
     viewModel { CatalogViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { StatsViewModel(get()) }
+    viewModel { AirQualityMapViewModel() }
 
     single {
         Room.databaseBuilder(

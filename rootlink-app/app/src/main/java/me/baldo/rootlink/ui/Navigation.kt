@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapScreen
+import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapViewModel
 import me.baldo.rootlink.ui.screens.catalog.CatalogScreen
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatScreen
@@ -90,7 +91,13 @@ fun RootlinkNavGraph(navController: NavHostController) {
         }
 
         composable<RootlinkRoute.AirQualityMap> {
-            AirQualityMapScreen(navController)
+            val airQualityMapVM = koinViewModel<AirQualityMapViewModel>()
+            val airQualityMapState by airQualityMapVM.state.collectAsStateWithLifecycle()
+            AirQualityMapScreen(
+                airQualityMapState = airQualityMapState,
+                airQualityMapActions = airQualityMapVM.action,
+                navController
+            )
         }
 
         composable<RootlinkRoute.Favourites> {

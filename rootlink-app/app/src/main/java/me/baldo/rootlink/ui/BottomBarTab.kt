@@ -60,7 +60,6 @@ sealed interface BottomBarTab {
             Home,
             Map,
             AirQualityMap,
-            Favourites,
             Catalog
         )
     }
