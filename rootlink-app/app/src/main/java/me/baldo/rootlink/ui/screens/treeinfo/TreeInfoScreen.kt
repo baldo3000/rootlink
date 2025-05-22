@@ -1,9 +1,12 @@
 package me.baldo.rootlink.ui.screens.treeinfo
 
+import android.graphics.Paint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,12 +34,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.baldo.rootlink.R
 import me.baldo.rootlink.ui.composables.TopBar
 import java.util.Locale
+
+private data class AqiCategory(val start: Int, val end: Int, val color: Color)
+
+private val aqiCategories = listOf(
+    AqiCategory(0, 50, Color(0xff00e501)), // Good — green
+    AqiCategory(51, 100, Color(0xfffeff01)), // Moderate — yellow
+    AqiCategory(101, 150, Color(0xfffe7e01)), // Unhealthy for Sensitive — orange
+    AqiCategory(151, 200, Color(0xffff0101)), // Unhealthy — red
+    AqiCategory(201, 300, Color(0xff8e3e97)), // Very Unhealthy — purple
+    AqiCategory(301, 400, Color(0xff7e0122))  // Hazardous — maroon
+)
+
+private val aqiCategoriesColorsDisplacement = listOf(
+    Color(0xff00e501),
+    Color(0xfffeff01),
+    Color(0xfffe7e01),
+    Color(0xffff0101),
+    Color(0xff8e3e97),
+    Color(0xff8e3e97),
+    Color(0xff7e0122),
+    Color(0xff7e0122)
+)
 
 @Composable
 fun TreeInfoScreen(
@@ -62,6 +95,21 @@ fun TreeInfoScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
+                val aqiDescriptionFormatted =
+                    if (treeInfoState.currentAqiDescription.isNotBlank()) treeInfoState.currentAqiDescription
+                    else stringResource(R.string.tree_info_unknown_aqi)
+
+                Text(
+                    text = "${stringResource(R.string.tree_info_aqi)}: ${treeInfoState.currentAqiValue} - $aqiDescriptionFormatted",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                AqiBar(
+                    treeInfoState.currentAqiValue,
+                    labelColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
                 // Identification & Location
                 SectionCard(title = stringResource(R.string.tree_info_section_identification)) {
                     InfoRow(
@@ -244,6 +292,103 @@ private fun InfoRow(
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+/**
+ * Draws a horizontal AQI bar with six colored segments,
+ * plus a marker circle positioned according to [currentAqi].
+ *
+ * @param currentAqi the current AQI value (0…400). Values outside will be clamped.
+ * @param height the thickness of the bar
+ */
+@Composable
+private fun AqiBar(
+    currentAqi: Int,
+    height: Dp = 16.dp,
+    labelTextSize: Dp = 12.dp,
+    labelColor: Color = Color.Black
+) {
+    val aqi = currentAqi.coerceIn(0, 400)
+
+    val gradient = Brush.horizontalGradient(
+        colors = aqiCategoriesColorsDisplacement
+    )
+    val circleColor = MaterialTheme.colorScheme.surfaceContainer
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height + labelTextSize + 4.dp)
+    ) {
+        val w = size.width
+        val h = height.toPx()
+
+        // Draw the pill‐shaped gradient bar
+        drawRoundRect(
+            brush = gradient,
+            topLeft = Offset(0f, 0f),
+            size = androidx.compose.ui.geometry.Size(w, h),
+            cornerRadius = CornerRadius(h / 2f, h / 2f)
+        )
+
+        // Draw the ping circle
+        val pingCat = aqiCategories.first { aqi in it.start..it.end }
+        val cx = (aqi / 400f) * w
+        val cy = h / 2f
+        val pingR = h * 0.75f
+
+        drawCircle(
+            color = pingCat.color,
+            center = Offset(cx, cy),
+            radius = pingR
+        )
+        drawCircle(
+            color = circleColor,
+            center = Offset(cx, cy),
+            radius = pingR,
+            style = Stroke(width = h * 0.1f)
+        )
+
+        // Prepare Paint for labels
+        val paint = Paint().apply {
+            isAntiAlias = true
+            textSize = labelTextSize.toPx()
+            color = labelColor.toArgb()
+        }
+        // baseline Y: just below bar + small padding
+        val y = h + 4.dp.toPx() - paint.ascent()
+
+        // Draw internal boundary labels (50, 100, 150, 200, 300)
+        paint.textAlign = Paint.Align.CENTER
+        aqiCategories.forEach { cat ->
+            if (cat.end < 400) {
+                val x = (cat.end / 400f) * w
+                drawContext.canvas.nativeCanvas.drawText(
+                    cat.end.toString(),
+                    x,
+                    y,
+                    paint
+                )
+            }
+        }
+
+        // Draw start (“0”) and end (“500”) labels
+        // “0” at left
+        paint.textAlign = Paint.Align.LEFT
+        drawContext.canvas.nativeCanvas.drawText(
+            "0",
+            0f,
+            y,
+            paint
+        )
+        // “400” at right
+        paint.textAlign = Paint.Align.RIGHT
+        drawContext.canvas.nativeCanvas.drawText(
+            "400+",
+            w,
+            y,
+            paint
         )
     }
 }

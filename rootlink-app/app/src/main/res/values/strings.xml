@@ -65,6 +65,8 @@
     <string name="tree_info_yes">Yes</string>
     <string name="tree_info_no">No</string>
     <string name="tree_info_unknown">Unknown Tree</string>
+    <string name="tree_info_aqi">Air quality index (AQI)</string>
+    <string name="tree_info_unknown_aqi">Unknown</string>
 
     <string name="tree_info_action_collapse">Collapse</string>
     <string name="tree_info_action_expand">Expand</string>

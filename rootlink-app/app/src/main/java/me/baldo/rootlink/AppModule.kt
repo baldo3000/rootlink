@@ -44,7 +44,7 @@ val appModule = module {
 
     viewModel { ChatViewModel(get(), get(), get(), get()) }
     viewModel { MapViewModel(get()) }
-    viewModel { TreeInfoViewModel(get()) }
+    viewModel { TreeInfoViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { CatalogViewModel(get()) }
     viewModel { ProfileViewModel(get()) }

@@ -98,13 +98,11 @@ private fun StatCircle(currentValue: Int, maxValue: Int) {
     val circleSize = 80.dp
     val boxSize = circleSize + strokeWidth
     val color = MaterialTheme.colorScheme.primary
-
     Box(
         modifier = Modifier.size(boxSize),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(circleSize)) {
-
             drawCircle(
                 color = Color.LightGray,
                 style = Stroke(width = strokeWidth.toPx())
