@@ -83,11 +83,7 @@ fun HomeOverlay(
 
                     Spacer(Modifier.height(12.dp))
 
-                    Text(
-                        text = stringResource(R.string.menu_profile),
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    NavigationDrawerSectionTitle(stringResource(R.string.menu_profile))
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.menu_item_edit_profile)) },
                         selected = false,
@@ -117,13 +113,9 @@ fun HomeOverlay(
                         }
                     )
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    NavigationDrawerSectionDivider()
 
-                    Text(
-                        text = stringResource(R.string.menu_utils),
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    NavigationDrawerSectionTitle(stringResource(R.string.menu_utils))
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.menu_item_catalog)) },
                         selected = false,
@@ -157,13 +149,9 @@ fun HomeOverlay(
                         }
                     )
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    NavigationDrawerSectionDivider()
 
-                    Text(
-                        text = stringResource(R.string.menu_options),
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    NavigationDrawerSectionTitle(stringResource(R.string.menu_options))
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.menu_item_settings)) },
                         selected = false,
@@ -215,4 +203,19 @@ fun HomeOverlay(
             content(innerPadding)
         }
     }
+}
+
+@Composable
+private fun NavigationDrawerSectionDivider() {
+    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+}
+
+@Composable
+private fun NavigationDrawerSectionTitle(text: String) {
+    Text(
+        text = text,
+        modifier = Modifier.padding(16.dp),
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary
+    )
 }
