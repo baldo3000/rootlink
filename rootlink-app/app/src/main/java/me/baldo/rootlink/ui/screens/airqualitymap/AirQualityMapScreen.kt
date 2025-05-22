@@ -92,7 +92,7 @@ private fun Map(
 ) {
     val ctx = LocalContext.current
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(42.7189196, 12.8998566), 5.5f)
+        position = CameraPosition.fromLatLngZoom(LatLng(42.7189196, 12.4998566), 5.55f)
     }
 
     Scaffold(
@@ -111,10 +111,13 @@ private fun Map(
                     LatLng(47.224792, 18.774244)
                 ),
                 mapType = MapType.NORMAL,
-                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style_map),
-                minZoomPreference = 5.5f
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                    ctx,
+                    R.raw.map_style_airquality
+                )
             ),
             uiSettings = MapUiSettings(
+                zoomGesturesEnabled = false,
                 scrollGesturesEnabled = false,
                 scrollGesturesEnabledDuringRotateOrZoom = false,
                 rotationGesturesEnabled = false,
