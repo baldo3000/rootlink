@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -36,6 +37,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import me.baldo.rootlink.R
 import me.baldo.rootlink.data.database.ChatMessage
+import me.baldo.rootlink.ui.RootlinkRoute
+import me.baldo.rootlink.ui.composables.ExtraAction
 import me.baldo.rootlink.ui.composables.TopBar
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,8 +48,7 @@ import java.util.Locale
 fun ChatScreen(
     chatState: ChatState,
     chatActions: ChatActions,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    navController: NavHostController
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(chatState.chatMessages.size) {
@@ -59,7 +61,18 @@ fun ChatScreen(
         topBar = {
             TopBar(
                 title = "${stringResource(R.string.screen_chat)} (${chatState.tree?.species})",
-                onBackPressed = navController::navigateUp
+                onBackPressed = navController::navigateUp,
+                extraActions = listOf(
+                    ExtraAction(
+                        icon = Icons.Outlined.Info,
+                        description = stringResource(R.string.chat_info_button),
+                        onClick = {
+                            chatState.tree?.let {
+                                navController.navigate(RootlinkRoute.TreeInfo(it.cardId))
+                            }
+                        }
+                    )
+                )
             )
         },
         bottomBar = {

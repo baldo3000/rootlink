@@ -452,6 +452,7 @@ private fun TreeInfoDialog(
                 if (chatEnabled) stringResource(R.string.map_tree_chat)
                 else stringResource(R.string.map_tree_chat_disabled)
             Button(
+                // Uncomment to restrict chat to nearby trees
                 // enabled = chatEnabled,
                 onClick = onChatClick
             ) {

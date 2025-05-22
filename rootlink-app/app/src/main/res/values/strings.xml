@@ -100,6 +100,7 @@
     <!-- Chat -->
     <string name="chat_text_field_placeholder">Ask something to the tree…</string>
     <string name="chat_send_button">Send</string>
+    <string name="chat_info_button">Tree info</string>
 
     <!-- Catalog -->
     <string name="catalog_action_collapse">Collapse</string>
