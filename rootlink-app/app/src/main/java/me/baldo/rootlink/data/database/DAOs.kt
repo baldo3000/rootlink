@@ -30,4 +30,32 @@ interface TreesDAO {
 
     @Insert
     suspend fun insertChatMessageToTreeChat(chatMessage: ChatMessage)
+
+    @Query("SELECT DISTINCT region FROM Tree")
+    suspend fun getRegions(): List<String>
+
+    // Count section
+
+    @Query(
+        """
+    SELECT COUNT(*) FROM Tree 
+    WHERE region = :region 
+    AND cardId IN (
+        SELECT DISTINCT treeId FROM ChatMessage
+    )
+    """
+    )
+    suspend fun getTreesInteractedWithInRegionCount(region: String): Int
+
+    @Query("SELECT COUNT(*) FROM Tree WHERE region = :region")
+    suspend fun getTreesInRegionCount(region: String): Int
+
+    @Query("SELECT COUNT(DISTINCT treeId) FROM ChatMessage")
+    suspend fun getTreesInteractedWithCount(): Int
+
+    @Query("SELECT COUNT(*) FROM Tree")
+    suspend fun getTreesCount(): Int
+
+    @Query("SELECT COUNT(DISTINCT region) FROM Tree WHERE cardId IN (SELECT DISTINCT treeId FROM ChatMessage)")
+    suspend fun getRegionsInteractedWithCount(): Int
 }

@@ -13,12 +13,15 @@ import me.baldo.rootlink.ui.screens.catalog.CatalogScreen
 import me.baldo.rootlink.ui.screens.catalog.CatalogViewModel
 import me.baldo.rootlink.ui.screens.chat.ChatScreen
 import me.baldo.rootlink.ui.screens.chat.ChatViewModel
+import me.baldo.rootlink.ui.screens.home.HomeScreen
 import me.baldo.rootlink.ui.screens.map.MapScreen
 import me.baldo.rootlink.ui.screens.map.MapViewModel
 import me.baldo.rootlink.ui.screens.profile.ProfileScreen
 import me.baldo.rootlink.ui.screens.profile.ProfileViewModel
 import me.baldo.rootlink.ui.screens.settings.SettingsScreen
 import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
+import me.baldo.rootlink.ui.screens.stats.StatsScreen
+import me.baldo.rootlink.ui.screens.stats.StatsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoScreen
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -49,6 +52,9 @@ sealed interface RootlinkRoute {
     data object Profile : RootlinkRoute
 
     @Serializable
+    data object Stats : RootlinkRoute
+
+    @Serializable
     data object Catalog : RootlinkRoute
 }
 
@@ -67,10 +73,10 @@ fun RootlinkNavGraph(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = RootlinkRoute.Map
+        startDestination = RootlinkRoute.Home
     ) {
         composable<RootlinkRoute.Home> {
-
+            HomeScreen(navController)
         }
 
         composable<RootlinkRoute.Map> {
@@ -122,6 +128,15 @@ fun RootlinkNavGraph(navController: NavHostController) {
             ProfileScreen(
                 profileState = profileState,
                 profileActions = profileVM.actions,
+                navController = navController
+            )
+        }
+
+        composable<RootlinkRoute.Stats> {
+            val statsVM = koinViewModel<StatsViewModel>()
+            val statsState by statsVM.state.collectAsStateWithLifecycle()
+            StatsScreen(
+                statsState = statsState,
                 navController = navController
             )
         }

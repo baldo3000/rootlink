@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.outlined.ManageAccounts
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
@@ -99,6 +100,20 @@ fun HomeOverlay(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate(RootlinkRoute.Profile)
+                        }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(R.string.menu_item_stats)) },
+                        selected = false,
+                        icon = {
+                            Icon(
+                                Icons.Outlined.QueryStats,
+                                contentDescription = stringResource(R.string.menu_item_stats)
+                            )
+                        },
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(RootlinkRoute.Stats)
                         }
                     )
 
