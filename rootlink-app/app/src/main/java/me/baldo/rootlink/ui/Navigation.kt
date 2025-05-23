@@ -57,9 +57,6 @@ sealed interface RootlinkRoute {
     data object AirQualityMap : RootlinkRoute
 
     @Serializable
-    data object Favourites : RootlinkRoute
-
-    @Serializable
     data object Chat : RootlinkRoute
 
     @Serializable
@@ -156,10 +153,6 @@ fun RootlinkNavGraph(navController: NavHostController) {
                 airQualityMapActions = airQualityMapVM.action,
                 navController
             )
-        }
-
-        composable<RootlinkRoute.Favourites> {
-
         }
 
         composable<RootlinkRoute.Chat> {

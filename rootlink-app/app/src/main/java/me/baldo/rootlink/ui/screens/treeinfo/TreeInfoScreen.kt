@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -230,7 +231,12 @@ private fun SectionCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = !expanded }
+                    .clickable(
+                        role = Role.DropdownList,
+                        onClickLabel =
+                            if (expanded) stringResource(R.string.tree_info_action_collapse)
+                            else stringResource(R.string.tree_info_action_expand)
+                    ) { expanded = !expanded }
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

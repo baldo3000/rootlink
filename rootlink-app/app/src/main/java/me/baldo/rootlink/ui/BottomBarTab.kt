@@ -41,13 +41,6 @@ sealed interface BottomBarTab {
         override val screen = RootlinkRoute.AirQualityMap
     }
 
-    data object Favourites : BottomBarTab {
-        override val icon = Icons.Outlined.FavoriteBorder
-        override val iconSelected = Icons.Filled.Favorite
-        override val titleResID = R.string.screen_favourites
-        override val screen = RootlinkRoute.Favourites
-    }
-
     data object Catalog : BottomBarTab {
         override val icon = Icons.AutoMirrored.Outlined.ViewList
         override val iconSelected = Icons.AutoMirrored.Filled.ViewList

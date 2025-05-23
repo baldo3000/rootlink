@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.baldo.rootlink.R
@@ -103,7 +104,12 @@ private fun SectionCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .clickable { expanded = !expanded }
+                    .clickable(
+                        role = Role.DropdownList,
+                        onClickLabel =
+                            if (expanded) stringResource(R.string.catalog_action_collapse)
+                            else stringResource(R.string.catalog_action_expand)
+                    ) { expanded = !expanded }
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
