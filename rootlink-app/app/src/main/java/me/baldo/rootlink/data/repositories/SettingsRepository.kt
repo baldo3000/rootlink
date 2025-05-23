@@ -12,6 +12,7 @@ class SettingsRepository(
     companion object {
         private val SETUP_DONE_KEY = booleanPreferencesKey("setup_done")
         private val SHOW_ALL_TREES_KEY = booleanPreferencesKey("show_all_trees")
+        private val SIMPLER_MARKERS_KEY = booleanPreferencesKey("simpler_markers")
     }
 
     val setupDone = dataStore.data.map { it[SETUP_DONE_KEY] == true }
@@ -21,4 +22,8 @@ class SettingsRepository(
     val showAllTrees = dataStore.data.map { it[SHOW_ALL_TREES_KEY] == true }
     suspend fun setShowAllTrees(showAll: Boolean) =
         dataStore.edit { it[SHOW_ALL_TREES_KEY] = showAll }
+
+    val simplerMarkers = dataStore.data.map { it[SIMPLER_MARKERS_KEY] == true }
+    suspend fun setSimplerMarkers(simpler: Boolean) =
+        dataStore.edit { it[SIMPLER_MARKERS_KEY] = simpler }
 }

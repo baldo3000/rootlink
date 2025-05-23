@@ -91,6 +91,10 @@
     <string name="settings_map_show_all_trees_details">Show trees without significant public interest\nNote: this may cause lag</string>
     <string name="settings_map_show_all_trees_on">Show all trees</string>
     <string name="settings_map_show_all_trees_off">Hide trees without significant public interest</string>
+    <string name="settings_map_simpler_markers">Use simpler markers</string>
+    <string name="settings_map_simpler_markers_details">May improve performance</string>
+    <string name="settings_map_simpler_markers_on">Enable simpler markers</string>
+    <string name="settings_map_simpler_markers_off">Disable simpler markers</string>
     <string name="settings_debug_launch_setup">Launch setup</string>
     <string name="settings_debug_developer_options">Enable developer options</string>
     <string name="settings_debug_developer_options_on">Enable developer options</string>

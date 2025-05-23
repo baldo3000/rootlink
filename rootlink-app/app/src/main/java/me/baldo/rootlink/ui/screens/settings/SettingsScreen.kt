@@ -59,6 +59,14 @@ fun SettingsScreen(
                 checked = settingsState.showAllMonumentalTrees,
                 onCheckedChange = settingsActions::onShowAllMonumentalTreesChanged
             )
+            SwitchRowWithDescription(
+                text = stringResource(R.string.settings_map_simpler_markers),
+                description = stringResource(R.string.settings_map_simpler_markers_details),
+                onLabel = stringResource(R.string.settings_map_simpler_markers_on),
+                offLabel = stringResource(R.string.settings_map_simpler_markers_off),
+                checked = settingsState.simplerMarkers,
+                onCheckedChange = settingsActions::onSimplerMarkersChanged
+            )
 
             Spacer(Modifier.height(28.dp))
             Category(stringResource(R.string.settings_category_debug))

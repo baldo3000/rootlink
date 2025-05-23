@@ -140,6 +140,7 @@ fun RootlinkNavGraph(navController: NavHostController) {
                 mapState = mapState,
                 mapActions = mapVM.actions,
                 showAllTrees = settingsState.showAllMonumentalTrees,
+                simplerMarkers = settingsState.simplerMarkers,
                 openTreeChat = chatVM.actions::openTreeChat,
                 navController = navController
             )

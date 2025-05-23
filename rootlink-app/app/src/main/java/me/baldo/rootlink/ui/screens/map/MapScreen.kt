@@ -96,9 +96,10 @@ fun MapScreen(
     mapState: MapState,
     mapActions: ChatActions,
     openTreeChat: (String) -> Unit,
-    showAllTrees: Boolean,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showAllTrees: Boolean = false,
+    simplerMarkers: Boolean = false,
 ) {
     val ctx = LocalContext.current
 
@@ -194,7 +195,8 @@ fun MapScreen(
                         openTreeChat(it.cardId)
                         navController.navigate(RootlinkRoute.Chat)
                     },
-                    modifier = modifier.padding(innerPadding)
+                    modifier = modifier.padding(innerPadding),
+                    simplerMarkers = simplerMarkers
                 )
         }
     }
@@ -208,7 +210,8 @@ private fun Map(
     setFollowUser: (Boolean) -> Unit,
     onTreeInfoClick: (Tree) -> Unit,
     onTreeChatClick: (Tree) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    simplerMarkers: Boolean = false
 ) {
     val ctx = LocalContext.current
     val locationService = remember { LocationService(ctx) }
@@ -334,7 +337,7 @@ private fun Map(
                 clusterContent = null,
                 clusterItemContent = { tree ->
                     Icon(
-                        painter = painterResource(R.drawable.tree),
+                        painter = painterResource(if (simplerMarkers) R.drawable.green_circle else R.drawable.tree),
                         contentDescription = tree.species,
                         tint = Color.Unspecified
                     )

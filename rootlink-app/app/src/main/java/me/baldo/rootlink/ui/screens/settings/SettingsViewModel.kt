@@ -11,18 +11,20 @@ import me.baldo.rootlink.data.repositories.SettingsRepository
 
 data class SettingsState(
     val showAllMonumentalTrees: Boolean,
+    val simplerMarkers: Boolean,
     val showDeveloperOptions: Boolean = false
 )
 
 interface SettingsActions {
     fun onShowAllMonumentalTreesChanged(showAll: Boolean)
+    fun onSimplerMarkersChanged(simplerMarkers: Boolean)
     fun onShowDeveloperOptions(showDeveloperOptions: Boolean)
 }
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow<SettingsState>(SettingsState(false))
+    private val _state = MutableStateFlow<SettingsState>(SettingsState(false, false))
     val state = _state.asStateFlow()
 
     init {
@@ -36,6 +38,13 @@ class SettingsViewModel(
             _state.update { it.copy(showAllMonumentalTrees = showAll) }
             viewModelScope.launch {
                 settingsRepository.setShowAllTrees(showAll)
+            }
+        }
+
+        override fun onSimplerMarkersChanged(simplerMarkers: Boolean) {
+            _state.update { it.copy(simplerMarkers = simplerMarkers) }
+            viewModelScope.launch {
+                settingsRepository.setSimplerMarkers(simplerMarkers)
             }
         }
 
