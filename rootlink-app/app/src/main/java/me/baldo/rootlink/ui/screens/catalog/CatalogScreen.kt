@@ -49,14 +49,11 @@ fun CatalogScreen(
         },
         navController = navController
     ) { innerPadding ->
-        val padding = innerPadding
-
-
         // Group trees by region
         val groupedTreesByRegion = catalogState.trees.groupBy { it.region }
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
+                .padding(innerPadding)
                 .fillMaxWidth()
         ) {
             groupedTreesByRegion.forEach { (region, regionTrees) ->

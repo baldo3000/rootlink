@@ -121,6 +121,10 @@
     <string name="stats_regions">REGIONS interacted with</string>
     <string name="stats_region">Trees interacted with in %1$s</string>
 
+    <!-- Home -->
+    <string name="home_title">Welcome to Rootlink!</string>
+    <string name="home_explore_map">Start exploring the Map</string>
+
     <!-- Setup -->
     <string name="setup_back">Go back</string>
 
