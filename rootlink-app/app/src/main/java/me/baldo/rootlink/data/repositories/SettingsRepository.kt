@@ -10,11 +10,13 @@ class SettingsRepository(
     private val dataStore: DataStore<Preferences>
 ) {
     companion object {
+        private val SETUP_DONE_KEY = booleanPreferencesKey("setup_done")
         private val SHOW_ALL_TREES_KEY = booleanPreferencesKey("show_all_trees")
     }
 
-    // val username = dataStore.data.map { it[USERNAME_KEY] ?: "" }
-    // suspend fun setUsername(username: String) = dataStore.edit { it[USERNAME_KEY] = username }
+    val setupDone = dataStore.data.map { it[SETUP_DONE_KEY] == true }
+    suspend fun setSetupDone(done: Boolean) =
+        dataStore.edit { it[SETUP_DONE_KEY] = done }
 
     val showAllTrees = dataStore.data.map { it[SHOW_ALL_TREES_KEY] == true }
     suspend fun setShowAllTrees(showAll: Boolean) =

@@ -1,5 +1,6 @@
 package me.baldo.rootlink.ui.screens.settings
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.baldo.rootlink.R
+import me.baldo.rootlink.SetupActivity
 import me.baldo.rootlink.ui.composables.TopBar
 
 @Composable
@@ -28,6 +31,8 @@ fun SettingsScreen(
     settingsActions: SettingsActions,
     navController: NavHostController
 ) {
+    val ctx = LocalContext.current
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         topBar = {
@@ -47,9 +52,36 @@ fun SettingsScreen(
             SwitchRowWithDescription(
                 text = stringResource(R.string.settings_map_show_all_trees),
                 description = stringResource(R.string.settings_map_show_all_trees_details),
+                onLabel = stringResource(R.string.settings_map_show_all_trees_on),
+                offLabel = stringResource(R.string.settings_map_show_all_trees_off),
                 checked = settingsState.showAllMonumentalTrees,
                 onCheckedChange = settingsActions::onShowAllMonumentalTreesChanged
             )
+
+            Spacer(Modifier.height(28.dp))
+            Category(stringResource(R.string.settings_category_debug))
+            SwitchRowWithDescription(
+                text = stringResource(R.string.settings_debug_developer_options),
+                onLabel = stringResource(R.string.settings_debug_developer_options_on),
+                offLabel = stringResource(R.string.settings_debug_developer_options_off),
+                checked = settingsState.showDeveloperOptions,
+                onCheckedChange = settingsActions::onShowDeveloperOptions
+            )
+            if (settingsState.showDeveloperOptions) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                ) {
+                    RowButton(
+                        text = stringResource(R.string.settings_debug_launch_setup),
+                        clickLabel = stringResource(R.string.settings_debug_launch_setup),
+                        onClick = {
+                            ctx.startActivity(Intent(ctx, SetupActivity::class.java))
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -67,7 +99,9 @@ private fun Category(title: String) {
 @Composable
 private fun SwitchRowWithDescription(
     text: String,
-    description: String,
+    description: String? = null,
+    onLabel: String,
+    offLabel: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -76,9 +110,8 @@ private fun SwitchRowWithDescription(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                enabled = true,
                 role = Role.Switch,
-                onClickLabel = stringResource(if (checked) R.string.settings_map_show_all_trees_off else R.string.settings_map_show_all_trees_on),
+                onClickLabel = if (checked) offLabel else onLabel,
                 onClick = { onCheckedChange(!checked) })
             .padding(28.dp)
     ) {
@@ -87,16 +120,52 @@ private fun SwitchRowWithDescription(
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
             )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-            )
+            if (description != null) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
         Spacer(Modifier.weight(1f))
         Switch(
             checked = checked,
             onCheckedChange = null
         )
+    }
+}
+
+@Composable
+private fun RowButton(
+    text: String,
+    description: String? = null,
+    clickLabel: String,
+    onClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                role = Role.Button,
+                onClick = onClick,
+                onClickLabel = clickLabel,
+            )
+            .padding(28.dp)
+    ) {
+        Column {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            if (description != null) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
     }
 }

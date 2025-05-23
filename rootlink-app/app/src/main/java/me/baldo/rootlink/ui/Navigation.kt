@@ -1,5 +1,7 @@
 package me.baldo.rootlink.ui
 
+import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -8,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import me.baldo.rootlink.MainActivity
 import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapScreen
 import me.baldo.rootlink.ui.screens.airqualitymap.AirQualityMapViewModel
 import me.baldo.rootlink.ui.screens.catalog.CatalogScreen
@@ -21,11 +24,27 @@ import me.baldo.rootlink.ui.screens.profile.ProfileScreen
 import me.baldo.rootlink.ui.screens.profile.ProfileViewModel
 import me.baldo.rootlink.ui.screens.settings.SettingsScreen
 import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
+import me.baldo.rootlink.ui.screens.setup.end.SetupEndScreen
+import me.baldo.rootlink.ui.screens.setup.end.SetupEndViewModel
+import me.baldo.rootlink.ui.screens.setup.profile.SetupProfileScreen
+import me.baldo.rootlink.ui.screens.setup.profile.SetupProfileViewModel
+import me.baldo.rootlink.ui.screens.setup.welcome.WelcomeScreen
 import me.baldo.rootlink.ui.screens.stats.StatsScreen
 import me.baldo.rootlink.ui.screens.stats.StatsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoScreen
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.androidx.compose.koinViewModel
+
+sealed interface SetupRoute {
+    @Serializable
+    data object Welcome : RootlinkRoute
+
+    @Serializable
+    data object Profile : RootlinkRoute
+
+    @Serializable
+    data object End : RootlinkRoute
+}
 
 sealed interface RootlinkRoute {
     @Serializable
@@ -57,6 +76,45 @@ sealed interface RootlinkRoute {
 
     @Serializable
     data object Catalog : RootlinkRoute
+}
+
+@Composable
+fun SetupNavGraph(navController: NavHostController) {
+    val ctx = LocalActivity.current!!
+
+    NavHost(
+        navController = navController,
+        startDestination = SetupRoute.Welcome
+    ) {
+        composable<SetupRoute.Welcome> {
+            WelcomeScreen(
+                onNext = { navController.navigate(SetupRoute.Profile) }
+            )
+        }
+
+        composable<SetupRoute.Profile> {
+            val setupProfileVM = koinViewModel<SetupProfileViewModel>()
+            val setupProfileState by setupProfileVM.state.collectAsStateWithLifecycle()
+            SetupProfileScreen(
+                setupProfileState = setupProfileState,
+                setupProfileActions = setupProfileVM.actions,
+                onBack = { navController.navigateUp() },
+                onNext = { navController.navigate(SetupRoute.End) }
+            )
+        }
+
+        composable<SetupRoute.End> {
+            val setupEndVM = koinViewModel<SetupEndViewModel>()
+            SetupEndScreen(
+                onNext = {
+                    setupEndVM.actions.endSetup()
+                    ctx.startActivity(Intent(ctx, MainActivity::class.java))
+                    ctx.finish()
+                },
+                onBack = { navController.navigateUp() }
+            )
+        }
+    }
 }
 
 @Composable

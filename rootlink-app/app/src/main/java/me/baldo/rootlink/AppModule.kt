@@ -23,6 +23,8 @@ import me.baldo.rootlink.ui.screens.chat.ChatViewModel
 import me.baldo.rootlink.ui.screens.map.MapViewModel
 import me.baldo.rootlink.ui.screens.profile.ProfileViewModel
 import me.baldo.rootlink.ui.screens.settings.SettingsViewModel
+import me.baldo.rootlink.ui.screens.setup.end.SetupEndViewModel
+import me.baldo.rootlink.ui.screens.setup.profile.SetupProfileViewModel
 import me.baldo.rootlink.ui.screens.stats.StatsViewModel
 import me.baldo.rootlink.ui.screens.treeinfo.TreeInfoViewModel
 import org.koin.core.module.dsl.viewModel
@@ -50,6 +52,8 @@ val appModule = module {
     viewModel { ProfileViewModel(get()) }
     viewModel { StatsViewModel(get()) }
     viewModel { AirQualityMapViewModel() }
+    viewModel { SetupProfileViewModel(get()) }
+    viewModel { SetupEndViewModel(get()) }
 
     single {
         Room.databaseBuilder(

@@ -1,6 +1,8 @@
 <resources>
     <!-- App Name -->
     <string name="app_name">Rootlink</string>
+    <string name="setup_activity">Rootlink</string>
+    <string name="main_activity">Rootlink</string>
 
     <!-- Screens -->
     <string name="screen_map">Map</string>
@@ -89,10 +91,15 @@
 
     <!-- Settings -->
     <string name="settings_category_map">Map</string>
+    <string name="settings_category_debug">Debug</string>
     <string name="settings_map_show_all_trees">Show all trees</string>
     <string name="settings_map_show_all_trees_details">Show trees without significant public interest\nNote: this may cause lag</string>
     <string name="settings_map_show_all_trees_on">Show all trees</string>
     <string name="settings_map_show_all_trees_off">Hide trees without significant public interest</string>
+    <string name="settings_debug_launch_setup">Launch setup</string>
+    <string name="settings_debug_developer_options">Enable developer options</string>
+    <string name="settings_debug_developer_options_on">Enable developer options</string>
+    <string name="settings_debug_developer_options_off">Disable developer options</string>
 
     <!-- Profile -->
     <string name="profile_name">Name</string>
@@ -113,5 +120,21 @@
     <string name="stats_total_trees">TOTAL trees interacted with</string>
     <string name="stats_regions">REGIONS interacted with</string>
     <string name="stats_region">Trees interacted with in %1$s</string>
+
+    <!-- Setup -->
+    <string name="setup_back">Go back</string>
+
+    <!-- Setup Welcome -->
+    <string name="setup_welcome_title">Rootlink</string>
+    <string name="setup_welcome_next">Get started</string>
+
+    <!-- Setup Welcome -->
+    <string name="setup_profile_title">How should we (trees) refer to you?</string>
+    <string name="setup_profile_next">Next</string>
+
+    <!-- Setup Welcome -->
+    <string name="setup_end_title">Setup finished</string>
+    <string name="setup_end_text">Setup is finished! Get ready to explore the app</string>
+    <string name="setup_end_next">Next</string>
 
 </resources>

@@ -22,9 +22,9 @@
 
     <application
         android:name=".RootlinkApplication"
-        android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/rootlink_icon_foreground"
         android:label="@string/app_name"
@@ -32,17 +32,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Rootlink"
         android:usesCleartextTraffic="true"
-        tools:targetApi="35">
+        tools:targetApi="36">
         <activity
-            android:name=".MainActivity"
+            android:name=".SetupActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/setup_activity"
             android:theme="@style/Theme.Rootlink">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/main_activity"
+            android:theme="@style/Theme.Rootlink">
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"

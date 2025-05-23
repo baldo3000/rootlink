@@ -10,11 +10,13 @@ import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.repositories.SettingsRepository
 
 data class SettingsState(
-    val showAllMonumentalTrees: Boolean
+    val showAllMonumentalTrees: Boolean,
+    val showDeveloperOptions: Boolean = false
 )
 
 interface SettingsActions {
     fun onShowAllMonumentalTreesChanged(showAll: Boolean)
+    fun onShowDeveloperOptions(showDeveloperOptions: Boolean)
 }
 
 class SettingsViewModel(
@@ -35,6 +37,13 @@ class SettingsViewModel(
             viewModelScope.launch {
                 settingsRepository.setShowAllTrees(showAll)
             }
+        }
+
+        override fun onShowDeveloperOptions(showDeveloperOptions: Boolean) {
+            viewModelScope.launch {
+                settingsRepository.setSetupDone(false)
+            }
+            _state.update { it.copy(showDeveloperOptions = showDeveloperOptions) }
         }
     }
 }
