@@ -1,5 +1,6 @@
 package me.baldo.rootlink.ui.screens.airqualitymap
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -92,6 +93,7 @@ fun AirQualityMapScreen(
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
@@ -104,8 +106,7 @@ private fun Map(
 
     Scaffold(
         modifier = modifier.fillMaxSize()
-    ) { innerPadding ->
-        val tmp = innerPadding
+    ) {
         val tileProvider = remember { HeatmapTileProvider(BuildConfig.MAPS_KEY) }
 
         GoogleMap(

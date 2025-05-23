@@ -1,6 +1,7 @@
 package me.baldo.rootlink.ui.screens.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -270,6 +271,7 @@ private fun Map(
         }
     }
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
@@ -295,8 +297,7 @@ private fun Map(
                 }
             }
         }
-    ) { innerPadding ->
-        val tmp = innerPadding
+    ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,

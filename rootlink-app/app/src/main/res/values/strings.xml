@@ -13,20 +13,15 @@
     <string name="screen_profile">Profile</string>
     <string name="screen_stats">Stats</string>
     <string name="screen_home">Home</string>
-    <string name="screen_favourites">Favourites</string>
     <string name="screen_catalog">Catalog</string>
 
     <!-- Menu -->
     <string name="menu_drawer">Menu drawer</string>
-    <string name="menu_account">Account</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_options">Options</string>
     <string name="menu_utils">Utils</string>
 
     <!-- Menu Items -->
-    <string name="menu_item_login">Login</string>
-    <string name="menu_item_register">Register</string>
-    <string name="menu_item_logout">Logout</string>
     <string name="menu_item_edit_profile">Edit profile</string>
     <string name="menu_item_stats">Stats</string>
     <string name="menu_item_catalog">Catalog</string>
