@@ -1,6 +1,7 @@
 package me.baldo.rootlink.ui.composables
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -77,7 +79,8 @@ fun HomeOverlay(
                         Text(
                             stringResource(R.string.app_name),
                             modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
                         )
                     }
 
@@ -175,7 +178,13 @@ fun HomeOverlay(
                                 contentDescription = stringResource(R.string.menu_item_help)
                             )
                         },
-                        onClick = { /* TODO: handle click */ }
+                        onClick = {
+                            Toast.makeText(
+                                ctx,
+                                ctx.getString(R.string.help_toast),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     )
                 }
             }
