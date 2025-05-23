@@ -1,6 +1,7 @@
 package me.baldo.rootlink.ui.screens.settings
 
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ fun SettingsScreen(
     navController: NavHostController
 ) {
     val ctx = LocalContext.current
+    val activity = LocalActivity.current
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -78,6 +80,7 @@ fun SettingsScreen(
                         clickLabel = stringResource(R.string.settings_debug_launch_setup),
                         onClick = {
                             ctx.startActivity(Intent(ctx, SetupActivity::class.java))
+                            activity?.finish()
                         }
                     )
                 }
