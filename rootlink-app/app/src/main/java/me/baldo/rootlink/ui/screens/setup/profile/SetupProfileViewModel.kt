@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.baldo.rootlink.data.repositories.ProfileRepository
@@ -24,7 +25,7 @@ class SetupProfileViewModel(
 
     init {
         viewModelScope.launch {
-            _state.update { it.copy(name = "") }
+            _state.update { it.copy(name = profileRepository.name.first()) }
         }
     }
 
