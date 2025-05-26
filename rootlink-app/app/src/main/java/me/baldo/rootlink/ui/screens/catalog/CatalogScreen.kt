@@ -103,7 +103,7 @@ private fun SectionCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .background(MaterialTheme.colorScheme.primary)
                     .clickable(
                         role = Role.DropdownList,
                         onClickLabel =
@@ -116,13 +116,14 @@ private fun SectionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
                     contentDescription =
                         if (expanded) stringResource(R.string.catalog_action_collapse)
-                        else stringResource(R.string.catalog_action_expand)
+                        else stringResource(R.string.catalog_action_expand),
+                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
 
@@ -146,7 +147,7 @@ private fun TreeCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondary
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -156,7 +157,6 @@ private fun TreeCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .clickable { onTreeClick() }
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -165,7 +165,7 @@ private fun TreeCard(
                     Text(
                         text = id.uppercase(),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
                     Text(
                         text = species.replaceFirstChar {
@@ -174,12 +174,13 @@ private fun TreeCard(
                             ) else it.toString()
                         },
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                    contentDescription = stringResource(R.string.catalog_open_tree_info)
+                    contentDescription = stringResource(R.string.catalog_open_tree_info),
+                    tint = MaterialTheme.colorScheme.onSecondary
                 )
             }
         }
