@@ -125,10 +125,10 @@ private fun Map(
                 )
             ),
             uiSettings = MapUiSettings(
-                zoomGesturesEnabled = false,
-                scrollGesturesEnabled = false,
-                scrollGesturesEnabledDuringRotateOrZoom = false,
-                rotationGesturesEnabled = false,
+                // zoomGesturesEnabled = false,
+                // scrollGesturesEnabled = false,
+                // scrollGesturesEnabledDuringRotateOrZoom = false,
+                // rotationGesturesEnabled = false,
                 myLocationButtonEnabled = false,
                 mapToolbarEnabled = false,
                 zoomControlsEnabled = false
