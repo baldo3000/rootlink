@@ -40,6 +40,7 @@ import me.baldo.rootlink.data.database.ChatMessage
 import me.baldo.rootlink.ui.RootlinkRoute
 import me.baldo.rootlink.ui.composables.ExtraAction
 import me.baldo.rootlink.ui.composables.TopBar
+import me.baldo.rootlink.utils.parseMarkdownToAnnotatedString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -157,7 +158,7 @@ private fun ChatBubble(
                 )
         ) {
             Text(
-                text = message.content,
+                text = parseMarkdownToAnnotatedString(message.content),
                 color = when (message.role) {
                     "user" -> MaterialTheme.colorScheme.onPrimaryContainer
                     "assistant" -> MaterialTheme.colorScheme.onTertiaryContainer
