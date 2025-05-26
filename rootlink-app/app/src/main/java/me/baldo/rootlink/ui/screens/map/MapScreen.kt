@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -84,7 +85,9 @@ import me.baldo.rootlink.ui.composables.HomeOverlay
 import me.baldo.rootlink.utils.LocationService
 import me.baldo.rootlink.utils.PermissionStatus
 import me.baldo.rootlink.utils.calculateDistance
+import me.baldo.rootlink.utils.isLocationEnabled
 import me.baldo.rootlink.utils.isOnline
+import me.baldo.rootlink.utils.openLocationSettings
 import me.baldo.rootlink.utils.openWirelessSettings
 import me.baldo.rootlink.utils.rememberMultiplePermissions
 import java.util.Locale
@@ -218,6 +221,7 @@ private fun Map(
     val scope = rememberCoroutineScope()
     var selectedTree by remember { mutableStateOf<Tree>(Tree()) }
     var showTreeDialog by remember { mutableStateOf(false) }
+    var showLocationDisabledDialog by remember { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(42.7189196, 12.8998566), 6f)
     }
@@ -252,6 +256,10 @@ private fun Map(
         }
     }
 
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        if (!isLocationEnabled(ctx)) setFollowUser(false)
+    }
+
     // Start location updates when entering the Map route
     LaunchedEffect(Unit) {
         if (ActivityCompat.checkSelfPermission(
@@ -280,23 +288,31 @@ private fun Map(
         floatingActionButton = {
             if (isFollowingUser) {
                 FollowingUserFAB {
-                    setFollowUser(false)
+                    if (isLocationEnabled(ctx)) {
+                        setFollowUser(false)
+                    } else {
+                        showLocationDisabledDialog = true
+                    }
                 }
             } else {
                 NotFollowingUserFAB {
                     scope.launch {
-                        locationService.getCurrentLocation()?.let { newPosition ->
-                            cameraPositionState.animate(
-                                CameraUpdateFactory.newCameraPosition(
-                                    CameraPosition(
-                                        LatLng(newPosition.latitude, newPosition.longitude),
-                                        maxOf(cameraPositionState.position.zoom, 9f), 0f, 0f
+                        if (isLocationEnabled(ctx)) {
+                            setFollowUser(true)
+                            locationService.getCurrentLocation()?.let { newPosition ->
+                                cameraPositionState.animate(
+                                    CameraUpdateFactory.newCameraPosition(
+                                        CameraPosition(
+                                            LatLng(newPosition.latitude, newPosition.longitude),
+                                            maxOf(cameraPositionState.position.zoom, 9f), 0f, 0f
+                                        )
                                     )
                                 )
-                            )
+                            }
+                        } else {
+                            showLocationDisabledDialog = true
                         }
                     }
-                    setFollowUser(true)
                 }
             }
         }
@@ -397,6 +413,16 @@ private fun Map(
                 )
             }
         }
+
+        if (showLocationDisabledDialog) {
+            LocationDisabledDialog(
+                onConfirm = {
+                    showLocationDisabledDialog = false
+                    openLocationSettings(ctx)
+                },
+                onDismiss = { showLocationDisabledDialog = false }
+            )
+        }
     }
 }
 
@@ -482,6 +508,40 @@ private fun TreeInfoDialog(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.map_tree_info))
+            }
+        }
+    )
+}
+
+@Composable
+private fun LocationDisabledDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        icon = {
+            Icon(
+                Icons.Outlined.GpsOff,
+                contentDescription = stringResource(R.string.map_location_disabled)
+            )
+        },
+        title = {
+            Text(stringResource(R.string.map_location_disabled))
+        },
+        text = {
+            Text(stringResource(R.string.map_location_disabled_explanation))
+        },
+        confirmButton = {
+            Button(onConfirm) {
+                Text(stringResource(R.string.map_location_disabled_button))
+            }
+        },
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text(stringResource(R.string.map_location_disabled_dismiss))
             }
         }
     )

@@ -32,7 +32,8 @@
     <!-- Map -->
     <string name="map_location_disabled">Location is disabled</string>
     <string name="map_location_disabled_explanation">Location needs to be on in order to display the map</string>
-    <string name="map_location_disabled_button">Open location settings</string>
+    <string name="map_location_disabled_button">Open settings</string>
+    <string name="map_location_disabled_dismiss">Dismiss</string>
 
     <string name="map_location_permissions_missing">Location permission is missing</string>
     <string name="map_location_permissions_missing_explanation">You have previously denied permission. Location permission is needed in order to display the map</string>
