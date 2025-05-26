@@ -221,7 +221,7 @@ private fun SectionCard(
     var expanded by remember { mutableStateOf(true) }
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.secondary
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -243,13 +243,14 @@ private fun SectionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Outlined.KeyboardArrowDown else Icons.Outlined.KeyboardArrowUp,
                     contentDescription =
                         if (expanded) stringResource(R.string.tree_info_action_collapse)
-                        else stringResource(R.string.tree_info_action_expand)
+                        else stringResource(R.string.tree_info_action_expand),
+                    tint = MaterialTheme.colorScheme.onSecondary
                 )
             }
 
@@ -262,7 +263,7 @@ private fun SectionCard(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         thickness = 2.dp,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.12f)
+                        color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.12f)
                     )
                     Column(modifier = Modifier.padding(16.dp)) {
                         content()
@@ -288,7 +289,7 @@ private fun InfoRow(
             text = "$label:",
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSecondary
         )
         Text(
             text = if (capitalize)
@@ -297,7 +298,7 @@ private fun InfoRow(
                 } else value,
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSecondary
         )
     }
 }
