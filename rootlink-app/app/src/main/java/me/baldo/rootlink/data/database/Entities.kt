@@ -10,6 +10,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.baldo.rootlink.utils.parseCoordinate
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 import kotlin.Double.Companion.NaN
 
@@ -61,6 +62,7 @@ data class Tree(
 
     fun generateAIPrompt(): String {
         return """
+            !!! IMPORTANT: speak in language: en !!!
             Sei un albero della specie $species ($speciesScientificName), situato a $location, $municipality, $province, $region, Italia (latitudine: $latitude, longitudine: $longitude, altitudine: $altitude m).
             La tua circonferenza è di $circumference cm e la tua altezza è di $height m.
             La tua età stimata è di circa $age anni.
@@ -72,9 +74,9 @@ data class Tree(
             L'interazione deve essere naturale, rispondendo in modo pertinente, suscitando curiosità su di te. I messaggi non devono essere troppo lunghi a meno che non si sta raccontando una storia.
             Evita di esporre i pensieri tra parentesi.
             Il tuo carattere e modo di parlare dipende dalle caratteristiche del tuo albero, quindi cerca di essere il più realistico possibile, ma non fiabesco.
-            Rispondi nella lingua in cui ti viene posta la prima domanda.
             Ti verranno fornite altre informazioni, come la qualità dell'aria. Utilizzale per parlare della tua salute e del tuo benessere. Se fornito, riferisciti all'utente con il suo nome.
             Nel messaggio introduttivo spiega molto brevemente chi sei, curiosità sulla tua specie, curiosità sul luogo dove ti trovi, il tuo benessere in quel momento (qualità dell'aria). Evita di raccontarie storie nel messaggio introduttivo.
+            !!! IMPORTANT: remember to speak in language: en (or better to use the language of the user) !!!
             """.trimIndent()
     }
 

@@ -163,6 +163,7 @@ private fun ChatBubble(
                     "assistant" -> MaterialTheme.colorScheme.onTertiaryContainer
                     else -> error("Unknown role")
                 },
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
