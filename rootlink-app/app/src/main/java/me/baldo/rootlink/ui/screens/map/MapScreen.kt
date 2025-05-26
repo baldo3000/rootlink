@@ -368,6 +368,20 @@ private fun Map(
                     showTreeDialog = true
                     isFollowingUser
                 }
+                clusterManager.setOnClusterClickListener { cluster ->
+                    if (!isFollowingUser) {
+                        scope.launch {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    cluster.position,
+                                    cameraPositionState.position.zoom + 3f
+                                )
+                            )
+                        }
+                        false
+                    }
+                    true
+                }
             }
             SideEffect {
                 if (clusterManager?.renderer != renderer) {
@@ -478,9 +492,10 @@ private fun TreeInfoDialog(
             Text(text = tree.location.replaceFirstChar { it.titlecase(Locale.getDefault()) })
         },
         confirmButton = {
-            val text =
-                if (chatEnabled) stringResource(R.string.map_tree_chat)
-                else stringResource(R.string.map_tree_chat_disabled)
+            val text = stringResource(R.string.map_tree_chat)
+            // Uncomment to restrict chat to nearby trees
+            // if (chatEnabled) stringResource(R.string.map_tree_chat)
+            // else stringResource(R.string.map_tree_chat_disabled)
             Button(
                 // Uncomment to restrict chat to nearby trees
                 // enabled = chatEnabled,
